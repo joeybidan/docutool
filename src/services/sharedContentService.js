@@ -1,0 +1,233 @@
+import {
+  FALLBACK_ANNOUNCEMENTS,
+  FALLBACK_LINKS,
+  FALLBACK_RECOGNITION,
+} from '../constants/defaults.js'
+import { getSupabaseClient, isSupabaseConfigured } from './supabaseClient.js'
+
+export const RECOGNITION_BUCKET = 'recognition-images'
+
+const mapAnnouncement = (row) => ({
+  id: row.id,
+  title: row.title,
+  message: row.message,
+  publishedAt: row.published_at || row.created_at,
+  sortOrder: row.sort_order ?? 0,
+  isPublished: row.is_published ?? true,
+})
+
+const mapLink = (row) => ({
+  id: row.id,
+  title: row.title,
+  description: row.description || '',
+  url: row.url,
+  sortOrder: row.sort_order ?? 0,
+  isPublished: row.is_published ?? true,
+})
+
+const mapRecognition = (row, client) => {
+  const imagePath = row.image_path || null
+  const imageUrl = imagePath
+    ? client.storage.from(RECOGNITION_BUCKET).getPublicUrl(imagePath).data.publicUrl
+    : ''
+
+  return {
+    id: row.id,
+    employeeName: row.employee_name,
+    category: row.category,
+    caption: row.caption || '',
+    imagePath,
+    imageUrl,
+    sortOrder: row.sort_order ?? 0,
+    isPublished: row.is_published ?? true,
+  }
+}
+
+export async function loadSharedContent() {
+  if (!isSupabaseConfigured) {
+    return {
+      announcements: FALLBACK_ANNOUNCEMENTS,
+      links: FALLBACK_LINKS,
+      recognition: FALLBACK_RECOGNITION,
+      source: 'preview',
+    }
+  }
+
+  const client = getSupabaseClient()
+  const [announcementsResult, linksResult, recognitionResult] = await Promise.all([
+    client
+      .from('announcements')
+      .select('id,title,message,published_at,sort_order,is_published,created_at')
+      .eq('is_published', true)
+      .order('sort_order')
+      .order('published_at', { ascending: false }),
+    client
+      .from('shared_links')
+      .select('id,title,description,url,sort_order,is_published')
+      .eq('is_published', true)
+      .order('sort_order'),
+    client
+      .from('top_performers')
+      .select('id,employee_name,category,caption,image_path,sort_order,is_published')
+      .eq('is_published', true)
+      .order('sort_order'),
+  ])
+
+  const firstError =
+    announcementsResult.error || linksResult.error || recognitionResult.error || null
+  if (firstError) throw firstError
+
+  return {
+    announcements: (announcementsResult.data || []).map(mapAnnouncement),
+    links: (linksResult.data || []).map(mapLink),
+    recognition: (recognitionResult.data || []).map((row) => mapRecognition(row, client)),
+    source: 'supabase',
+  }
+}
+
+export async function loadAdminContent() {
+  const client = await requireSecureAdmin()
+  const [announcementsResult, linksResult, recognitionResult] = await Promise.all([
+    client
+      .from('announcements')
+      .select('id,title,message,published_at,sort_order,is_published,created_at')
+      .order('sort_order')
+      .order('published_at', { ascending: false }),
+    client
+      .from('shared_links')
+      .select('id,title,description,url,sort_order,is_published')
+      .order('sort_order'),
+    client
+      .from('top_performers')
+      .select('id,employee_name,category,caption,image_path,sort_order,is_published')
+      .order('sort_order'),
+  ])
+
+  const firstError =
+    announcementsResult.error || linksResult.error || recognitionResult.error || null
+  if (firstError) throw firstError
+
+  return {
+    announcements: (announcementsResult.data || []).map(mapAnnouncement),
+    links: (linksResult.data || []).map(mapLink),
+    recognition: (recognitionResult.data || []).map((row) => mapRecognition(row, client)),
+  }
+}
+
+async function requireSecureAdmin() {
+  const client = getSupabaseClient()
+  const { data, error } = await client.auth.getUser()
+  if (error) throw error
+
+  if (data.user?.app_metadata?.docutool_role !== 'admin') {
+    const authorizationError = new Error(
+      'A signed-in Supabase user with app_metadata.docutool_role = "admin" is required for global writes.',
+    )
+    authorizationError.code = 'ADMIN_AUTH_REQUIRED'
+    throw authorizationError
+  }
+
+  return client
+}
+
+const announcementPayload = (values) => ({
+  title: values.title.trim(),
+  message: values.message.trim(),
+  is_published: values.isPublished ?? true,
+  sort_order: Number(values.sortOrder) || 0,
+  published_at: values.publishedAt || new Date().toISOString(),
+})
+
+const linkPayload = (values) => ({
+  title: values.title.trim(),
+  description: values.description?.trim() || null,
+  url: values.url.trim(),
+  is_published: values.isPublished ?? true,
+  sort_order: Number(values.sortOrder) || 0,
+})
+
+export async function saveAnnouncement(values) {
+  const client = await requireSecureAdmin()
+  const query = values.id
+    ? client.from('announcements').update(announcementPayload(values)).eq('id', values.id)
+    : client.from('announcements').insert(announcementPayload(values))
+  const { error } = await query
+  if (error) throw error
+}
+
+export async function deleteAnnouncement(id) {
+  const client = await requireSecureAdmin()
+  const { error } = await client.from('announcements').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function saveSharedLink(values) {
+  const client = await requireSecureAdmin()
+  const query = values.id
+    ? client.from('shared_links').update(linkPayload(values)).eq('id', values.id)
+    : client.from('shared_links').insert(linkPayload(values))
+  const { error } = await query
+  if (error) throw error
+}
+
+export async function deleteSharedLink(id) {
+  const client = await requireSecureAdmin()
+  const { error } = await client.from('shared_links').delete().eq('id', id)
+  if (error) throw error
+}
+
+function safeFilename(filename) {
+  return filename.toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '')
+}
+
+async function uploadRecognitionImage(client, file) {
+  const filePath = `${crypto.randomUUID()}/${Date.now()}-${safeFilename(file.name)}`
+  const { error } = await client.storage.from(RECOGNITION_BUCKET).upload(filePath, file, {
+    cacheControl: '3600',
+    contentType: file.type,
+    upsert: false,
+  })
+  if (error) throw error
+  return filePath
+}
+
+export async function saveRecognition(values, imageFile) {
+  const client = await requireSecureAdmin()
+  let imagePath = values.imagePath || null
+  let uploadedPath = null
+
+  if (imageFile) {
+    uploadedPath = await uploadRecognitionImage(client, imageFile)
+    imagePath = uploadedPath
+  }
+
+  const payload = {
+    employee_name: values.employeeName.trim(),
+    category: values.category,
+    caption: values.caption?.trim() || null,
+    image_path: imagePath,
+    is_published: values.isPublished ?? true,
+    sort_order: Number(values.sortOrder) || 0,
+  }
+
+  const query = values.id
+    ? client.from('top_performers').update(payload).eq('id', values.id)
+    : client.from('top_performers').insert(payload)
+  const { error } = await query
+
+  if (error) {
+    if (uploadedPath) await client.storage.from(RECOGNITION_BUCKET).remove([uploadedPath])
+    throw error
+  }
+
+  if (uploadedPath && values.imagePath) {
+    await client.storage.from(RECOGNITION_BUCKET).remove([values.imagePath])
+  }
+}
+
+export async function deleteRecognition(id, imagePath) {
+  const client = await requireSecureAdmin()
+  const { error } = await client.from('top_performers').delete().eq('id', id)
+  if (error) throw error
+  if (imagePath) await client.storage.from(RECOGNITION_BUCKET).remove([imagePath])
+}
