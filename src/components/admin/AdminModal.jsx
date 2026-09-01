@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { AlertTriangle, CheckCircle2, Database, LockKeyhole, X } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Database, LockKeyhole, LogOut, X } from 'lucide-react'
+import {
+  getSignedInAdmin,
+  signInAdmin,
+  signOutAdmin,
+} from '../../services/adminAuthService.js'
 import { loadAdminContent } from '../../services/sharedContentService.js'
 import { AdminContentManager } from './AdminContentManager.jsx'
 import { RecognitionManager } from './RecognitionManager.jsx'
@@ -15,6 +20,11 @@ export function AdminModal({ sharedContent, onRefresh, onNotify, onClose }) {
   const modalRef = useRef(null)
   const [password, setPassword] = useState('')
   const [accessEnabled, setAccessEnabled] = useState(false)
+  const [email, setEmail] = useState('')
+  const [accountPassword, setAccountPassword] = useState('')
+  const [adminUser, setAdminUser] = useState(null)
+  const [authError, setAuthError] = useState('')
+  const [authLoading, setAuthLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('announcements')
   const [passwordError, setPasswordError] = useState('')
   const [adminContent, setAdminContent] = useState(sharedContent)
@@ -41,7 +51,13 @@ export function AdminModal({ sharedContent, onRefresh, onNotify, onClose }) {
     }
   }, [onClose])
 
-  const handleUnlock = (event) => {
+  const openAdminWorkspace = async (user) => {
+    const secureContent = await loadAdminContent()
+    setAdminContent((current) => ({ ...current, ...secureContent, source: 'supabase' }))
+    setAdminUser(user)
+  }
+
+  const handleUnlock = async (event) => {
     event.preventDefault()
     if (password !== '000') {
       setPasswordError('Incorrect prototype password.')
@@ -49,13 +65,48 @@ export function AdminModal({ sharedContent, onRefresh, onNotify, onClose }) {
     }
     setPasswordError('')
     setAccessEnabled(true)
-    loadAdminContent()
-      .then((secureContent) =>
-        setAdminContent((current) => ({ ...current, ...secureContent, source: 'supabase' })),
-      )
-      .catch(() => {
-        setAdminContent(sharedContent)
-      })
+    setAuthLoading(true)
+
+    try {
+      const existingAdmin = await getSignedInAdmin()
+      if (existingAdmin) await openAdminWorkspace(existingAdmin)
+    } catch (error) {
+      setAuthError(error.message)
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  const handleSignIn = async (event) => {
+    event.preventDefault()
+    setAuthError('')
+    setAuthLoading(true)
+
+    try {
+      const user = await signInAdmin(email, accountPassword)
+      await openAdminWorkspace(user)
+      setAccountPassword('')
+    } catch (error) {
+      setAuthError(error.message)
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  const handleSignOut = async () => {
+    setAuthError('')
+    setAuthLoading(true)
+
+    try {
+      await signOutAdmin()
+      setAdminUser(null)
+      setAdminContent(sharedContent)
+      setAccountPassword('')
+    } catch (error) {
+      setAuthError(error.message)
+    } finally {
+      setAuthLoading(false)
+    }
   }
 
   return (
@@ -80,7 +131,7 @@ export function AdminModal({ sharedContent, onRefresh, onNotify, onClose }) {
 
         <div className="admin-security-note">
           <AlertTriangle size={16} aria-hidden="true" />
-          <span>Prototype password is a UI convenience only. Secure writes require Supabase Auth.</span>
+          <span>Enter 000 first, then sign in with your authorized Supabase admin account to save changes.</span>
         </div>
 
         {!accessEnabled ? (
@@ -105,15 +156,57 @@ export function AdminModal({ sharedContent, onRefresh, onNotify, onClose }) {
               {passwordError && <span className="field-error" role="alert">{passwordError}</span>}
             </div>
           </form>
+        ) : !adminUser ? (
+          <form className="admin-gate admin-sign-in" onSubmit={handleSignIn}>
+            <LockKeyhole size={23} aria-hidden="true" />
+            <div>
+              <label htmlFor="admin-email">Supabase admin sign-in</label>
+              <p>Use the email and password for the Supabase user marked as a DocuTool admin.</p>
+              <div className="admin-sign-in__fields">
+                <input
+                  id="admin-email"
+                  type="email"
+                  autoComplete="username"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="Admin email"
+                  required
+                  autoFocus
+                />
+                <input
+                  id="admin-account-password"
+                  type="password"
+                  aria-label="Admin password"
+                  autoComplete="current-password"
+                  value={accountPassword}
+                  onChange={(event) => setAccountPassword(event.target.value)}
+                  placeholder="Admin password"
+                  required
+                />
+                <Button variant="primary" type="submit" disabled={authLoading}>
+                  {authLoading ? 'Checking…' : 'Sign in'}
+                </Button>
+              </div>
+              {authError && <span className="field-error" role="alert">{authError}</span>}
+            </div>
+          </form>
         ) : (
           <>
             <div className="admin-access-status">
-              <span><CheckCircle2 size={15} /> Prototype access enabled</span>
-              <span className={`source-status source-status--${sharedContent.source}`}>
-                <Database size={14} />
-                {sharedContent.source === 'supabase' ? 'Supabase connected' : 'Preview mode'}
-              </span>
+              <div>
+                <span><CheckCircle2 size={15} /> Signed in as {adminUser.email}</span>
+                <span className="source-status source-status--supabase">
+                  <Database size={14} />
+                  Supabase connected
+                </span>
+              </div>
+              <Button size="small" type="button" onClick={handleSignOut} disabled={authLoading}>
+                <LogOut size={13} />
+                Sign out
+              </Button>
             </div>
+
+            {authError && <div className="field-error admin-auth-error" role="alert">{authError}</div>}
 
             <div className="admin-tabs" role="tablist" aria-label="Shared content management type">
               {ADMIN_TABS.map((tab) => (
@@ -163,3 +256,4 @@ export function AdminModal({ sharedContent, onRefresh, onNotify, onClose }) {
     </div>
   )
 }
+

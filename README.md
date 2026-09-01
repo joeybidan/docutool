@@ -164,9 +164,9 @@ The public visitor RPC is intentionally `SECURITY DEFINER`, but it accepts only 
 
 ## Admin security model
 
-Password `000` only reveals the prototype management interface. It provides no database authority.
+Password `000` reveals the Supabase admin sign-in form. The authorized manager must then sign in with the email and password of a Supabase Auth user whose `app_metadata.docutool_role` is `"admin"`. The frontend verifies that role before opening the management workspace, and the database independently enforces the same claim with RLS.
 
-The frontend service performs a convenience check for a signed-in Supabase user with the admin claim, and the database independently enforces the same claim with RLS. Before production manager use, add a real sign-in flow (SSO, magic link, or another approved Supabase Auth flow) and an audited process for assigning/removing admin claims.
+The browser keeps the Supabase session so an authorized manager does not need to sign in again on every visit. The **Sign out** button ends only the current browser session; it does not sign the manager out on other devices.
 
 Recommended production hardening:
 
@@ -247,3 +247,4 @@ The local Supabase migration could not be executed in this workspace because Doc
 ## Generated sample assets
 
 The three preview recognition portraits are fictional, generated specifically for this project, and stored under `public/recognition/`. Replace them through Supabase Storage when live employee recognition is configured.
+
