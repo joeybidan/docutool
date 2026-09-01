@@ -1,4 +1,5 @@
 import { Settings } from 'lucide-react'
+import { HourlyQuote } from './HourlyQuote.jsx'
 import { Button } from './ui/Button.jsx'
 import { TimezoneClocks } from './TimezoneClocks.jsx'
 import { VisitorCounter } from './VisitorCounter.jsx'
@@ -10,6 +11,7 @@ export function Header({ onOpenAdmin }) {
         <a className="brand" href="#workspace" aria-label="DocuTool home">
           Docu<span>Tool</span>
         </a>
+        <HourlyQuote />
         <VisitorCounter />
       </div>
 
@@ -23,3 +25,4 @@ export function Header({ onOpenAdmin }) {
     </header>
   )
 }
+

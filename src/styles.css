@@ -129,8 +129,9 @@ input::placeholder {
 }
 
 .brand-group {
-  flex: 0 0 auto;
-  gap: 22px;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 18px;
 }
 
 .brand {
@@ -145,6 +146,16 @@ input::placeholder {
 
 .brand span {
   color: var(--primary);
+}
+
+.hourly-quote {
+  max-width: 290px;
+  margin: 0;
+  color: #5d6c82;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11.5px;
+  font-style: italic;
+  line-height: 1.35;
 }
 
 .visitor-counter {
@@ -174,6 +185,7 @@ input::placeholder {
 }
 
 .header-utilities {
+  flex: 0 1 auto;
   min-width: 0;
   gap: 8px;
 }
@@ -763,14 +775,25 @@ input::placeholder {
 }
 
 .announcement-scroller {
+  position: relative;
   min-height: 0;
-  overflow: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #c8d2e0 transparent;
+  overflow: hidden;
 }
 
 .announcement-list {
+  position: absolute;
+  top: 100%;
+  right: 3px;
+  left: 3px;
   padding: 0 3px;
+  animation: announcement-rise var(--announcement-scroll-duration, 80s) linear infinite;
+  will-change: top, transform;
+}
+
+.announcement-scroller:hover .announcement-list,
+.announcement-scroller:focus .announcement-list,
+.announcement-scroller:focus-within .announcement-list {
+  animation-play-state: paused;
 }
 
 .announcement-item {
@@ -873,6 +896,83 @@ input::placeholder {
 .recognition-section {
   margin-top: 11px;
   padding: 14px 16px 16px;
+}
+
+.app-footer {
+  width: min(100%, 1800px);
+  margin: 0 auto;
+  padding: 0 14px 18px;
+  text-align: center;
+}
+
+.shift-reminder {
+  overflow: hidden;
+  border: 1px solid #c8d8ee;
+  border-radius: 8px 8px 0 0;
+  background: #f3f7fd;
+  color: #304d77;
+  font-size: 11.5px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.shift-reminder__track {
+  width: max-content;
+  padding: 8px 0;
+  animation: shift-reminder-marquee 72s linear infinite;
+  will-change: transform;
+}
+
+.shift-reminder__track span {
+  display: inline-block;
+  padding-left: 100vw;
+}
+
+.shift-reminder:hover .shift-reminder__track {
+  animation-play-state: paused;
+}
+
+.feedback-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: #fff;
+  color: var(--primary);
+  font-size: 11.5px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.feedback-link:hover {
+  background: #f7faff;
+  text-decoration: underline;
+}
+
+@keyframes announcement-rise {
+  from {
+    top: 100%;
+    transform: translateY(0);
+  }
+
+  to {
+    top: 0;
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes shift-reminder-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
 }
 
 .recognition-heading {
@@ -1410,11 +1510,23 @@ input::placeholder {
   }
 
   .brand-group {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     justify-content: space-between;
+    gap: 11px;
   }
 
   .brand {
     font-size: 34px;
+  }
+
+  .hourly-quote {
+    display: -webkit-box;
+    max-width: none;
+    overflow: hidden;
+    font-size: 10.5px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   .header-utilities {
@@ -1427,6 +1539,10 @@ input::placeholder {
 
   .app-main {
     padding: 9px 9px 22px;
+  }
+
+  .app-footer {
+    padding: 0 9px 14px;
   }
 
   .workspace-grid {
@@ -1597,6 +1713,31 @@ input::placeholder {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .announcement-scroller {
+    overflow: auto;
+  }
+
+  .announcement-list {
+    position: static;
+    animation: none !important;
+    transform: none;
+  }
+
+  .shift-reminder {
+    white-space: normal;
+  }
+
+  .shift-reminder__track {
+    width: auto;
+    padding: 8px 12px;
+    animation: none !important;
+    transform: none;
+  }
+
+  .shift-reminder__track span {
+    padding-left: 0;
   }
 }
 

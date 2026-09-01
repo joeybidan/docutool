@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { AdminModal } from './components/admin/AdminModal.jsx'
+import { AppFooter } from './components/AppFooter.jsx'
 import { AudioCapture } from './components/AudioCapture.jsx'
 import { Header } from './components/Header.jsx'
 import { InfoPanel } from './components/InfoPanel.jsx'
@@ -122,6 +123,8 @@ function App() {
         <RecognitionStrip recognition={sharedContent.recognition} />
       </main>
 
+      <AppFooter />
+
       {isAdminOpen && (
         <AdminModal
           sharedContent={sharedContent}
@@ -137,3 +140,4 @@ function App() {
 }
 
 export default App
+
