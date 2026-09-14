@@ -83,6 +83,41 @@ export const FALLBACK_RECOGNITION = [
   },
 ]
 
+export const FALLBACK_DASHBOARD_MEDIA = {
+  qa_scores_rank_mtd: {
+    slot: 'qa_scores_rank_mtd',
+    imagePath: null,
+    imageUrl: '',
+    answer: '',
+    revealAt: null,
+    isPublished: true,
+  },
+  puzzle_of_day: {
+    slot: 'puzzle_of_day',
+    imagePath: null,
+    imageUrl: '',
+    answer: '',
+    revealAt: null,
+    isPublished: true,
+  },
+  caregiver_of_day: {
+    slot: 'caregiver_of_day',
+    imagePath: null,
+    imageUrl: '',
+    answer: '',
+    revealAt: null,
+    isPublished: true,
+  },
+  sop_quiz_of_day: {
+    slot: 'sop_quiz_of_day',
+    imagePath: null,
+    imageUrl: '',
+    answer: '',
+    revealAt: null,
+    isPublished: true,
+  },
+}
+
 export const NOTE_LABELS = ['Note 1', 'Note 2', 'Note 3', 'Note 4', 'Note 5']
 
 export const RECOGNITION_CATEGORIES = ['Top Agent', 'Top CSAT', 'Top QA']
