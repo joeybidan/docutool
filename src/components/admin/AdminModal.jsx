@@ -8,6 +8,7 @@ import {
 import { loadAdminContent } from '../../services/sharedContentService.js'
 import { AdminContentManager } from './AdminContentManager.jsx'
 import { DashboardMediaManager } from './DashboardMediaManager.jsx'
+import { PhotoGalleryManager } from './PhotoGalleryManager.jsx'
 import { RecognitionManager } from './RecognitionManager.jsx'
 import { Button } from '../ui/Button.jsx'
 
@@ -15,6 +16,8 @@ const ADMIN_TABS = [
   { id: 'announcements', label: 'Announcements' },
   { id: 'links', label: 'SOP & Trainings' },
   { id: 'recognition', label: 'Recognition' },
+  { id: 'kudos', label: 'Kudos' },
+  { id: 'family-moments', label: 'Family Moments' },
   { id: 'dashboard-media', label: 'Dashboard Media' },
 ]
 
@@ -124,7 +127,7 @@ export function AdminModal({ sharedContent, onRefresh, onNotify, onClose }) {
         <header className="admin-modal__header">
           <div>
             <h2 id="admin-modal-title">Manage shared content</h2>
-            <p>Announcements, SOP & Trainings, recognition, and dashboard images</p>
+            <p>Announcements, SOP & Trainings, recognition, photo roulettes, and dashboard images</p>
           </div>
           <button className="icon-button" type="button" onClick={onClose} aria-label="Close admin modal">
             <X size={18} />
@@ -245,6 +248,24 @@ export function AdminModal({ sharedContent, onRefresh, onNotify, onClose }) {
               {activeTab === 'recognition' && (
                 <RecognitionManager
                   items={adminContent.recognition}
+                  onRefresh={refreshAdminContent}
+                  onNotify={onNotify}
+                />
+              )}
+              {activeTab === 'kudos' && (
+                <PhotoGalleryManager
+                  gallery="kudos"
+                  label="Kudos"
+                  items={adminContent.kudos || []}
+                  onRefresh={refreshAdminContent}
+                  onNotify={onNotify}
+                />
+              )}
+              {activeTab === 'family-moments' && (
+                <PhotoGalleryManager
+                  gallery="sharecare_family_moments"
+                  label="Sharecare Family Moments"
+                  items={adminContent.familyMoments || []}
                   onRefresh={refreshAdminContent}
                   onNotify={onNotify}
                 />
