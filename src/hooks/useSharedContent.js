@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   FALLBACK_ANNOUNCEMENTS,
+  FALLBACK_DASHBOARD_MEDIA,
   FALLBACK_LINKS,
   FALLBACK_RECOGNITION,
 } from '../constants/defaults.js'
@@ -11,6 +12,7 @@ export function useSharedContent() {
     announcements: FALLBACK_ANNOUNCEMENTS,
     links: FALLBACK_LINKS,
     recognition: FALLBACK_RECOGNITION,
+    dashboardMedia: FALLBACK_DASHBOARD_MEDIA,
     source: 'preview',
     loading: true,
     error: null,
@@ -28,6 +30,7 @@ export function useSharedContent() {
         announcements: FALLBACK_ANNOUNCEMENTS,
         links: FALLBACK_LINKS,
         recognition: FALLBACK_RECOGNITION,
+        dashboardMedia: FALLBACK_DASHBOARD_MEDIA,
         source: 'unavailable',
         loading: false,
         error,
