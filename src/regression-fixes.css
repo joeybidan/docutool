@@ -1,0 +1,72 @@
+/* Regression fixes after adding the dashboard side cards. */
+
+/* Manager Announcements used to fill the right column. Once the right column became a
+   stacked grid, the panel was allowed to collapse almost to its heading height, leaving
+   the animated announcement list with no visible scrolling area. Give it a real viewport
+   again so the existing upward animation has space to render. */
+.right-column > .info-panel {
+  height: clamp(340px, 38vh, 430px);
+  min-height: 340px;
+  max-height: none;
+}
+
+/* Recognition photos: hover magnification plus click-to-open viewer. */
+.recognition-card__portrait {
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+}
+
+.recognition-image-button {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  cursor: zoom-in;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.recognition-image-button img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recognition-image-button:hover,
+.recognition-image-button:focus-visible {
+  z-index: 20;
+  transform: scale(1.35);
+  box-shadow: 0 14px 34px rgb(15 23 42 / 0.28);
+}
+
+.recognition-gallery[data-layout='scroll'] {
+  padding-top: 18px;
+  padding-bottom: 20px;
+}
+
+@media (max-width: 1180px) {
+  .right-column > .info-panel {
+    height: 420px;
+    min-height: 420px;
+  }
+}
+
+@media (max-width: 820px) {
+  .right-column > .info-panel {
+    height: 360px;
+    min-height: 360px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recognition-image-button {
+    transition: none;
+  }
+}
