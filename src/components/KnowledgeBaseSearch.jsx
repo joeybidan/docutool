@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { Search } from 'lucide-react'
 
 const COMMON_TERMS = [
   'hire',
@@ -73,7 +72,7 @@ function SearchRow({ config }) {
         {suggestions.map((term) => <option value={term} key={term} />)}
       </datalist>
       <button type="submit" aria-label={`Search ${config.placeholder}`} title="Search in a new browser tab">
-        <Search size={17} />
+        <span aria-hidden="true">🔍</span>
       </button>
     </form>
   )
