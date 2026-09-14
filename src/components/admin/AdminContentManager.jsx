@@ -35,7 +35,7 @@ function valuesFromItem(type, item) {
 }
 
 export function AdminContentManager({ type, items, onRefresh, onNotify }) {
-  const singular = type === 'announcements' ? 'announcement' : 'link'
+  const singular = type === 'announcements' ? 'announcement' : 'SOP/training link'
   const [values, setValues] = useState(null)
   const [saving, setSaving] = useState(false)
 
@@ -72,7 +72,7 @@ export function AdminContentManager({ type, items, onRefresh, onNotify }) {
   return (
     <div className="admin-manager">
       <div className="admin-manager__toolbar">
-        <h3>{type === 'announcements' ? 'Announcements' : 'Shared links'}</h3>
+        <h3>{type === 'announcements' ? 'Announcements' : 'SOP & Trainings'}</h3>
         <Button
           size="small"
           variant="primary"
