@@ -7,7 +7,7 @@ export function InfoPanel({ announcements, links, source, loading }) {
   const [mode, setMode] = useState('announcements')
 
   return (
-    <aside className="panel info-panel" aria-label="Shared announcements and links">
+    <aside className="panel info-panel" aria-label="Shared announcements and SOP trainings">
       <div className="info-panel__switch" role="tablist" aria-label="Shared content type">
         <button
           type="button"
@@ -27,13 +27,13 @@ export function InfoPanel({ announcements, links, source, loading }) {
           onClick={() => setMode('links')}
         >
           <Link2 size={15} />
-          Links
+          SOP &amp; Trainings
         </button>
       </div>
 
       <div className="info-panel__body" role="tabpanel">
         <div className="info-panel__title-row">
-          <h2>{mode === 'announcements' ? 'Manager Announcements' : 'Useful Links'}</h2>
+          <h2>{mode === 'announcements' ? 'Manager Announcements' : 'SOP & Trainings'}</h2>
           {loading && <span className="loading-dot" aria-label="Loading shared content" />}
         </div>
         {mode === 'announcements' ? (
