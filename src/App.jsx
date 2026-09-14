@@ -7,7 +7,7 @@ import { Header } from './components/Header.jsx'
 import { InfoPanel } from './components/InfoPanel.jsx'
 import { KnowledgeBaseSearch } from './components/KnowledgeBaseSearch.jsx'
 import { NotesWorkspace } from './components/NotesWorkspace.jsx'
-import { RecognitionStrip } from './components/RecognitionStrip.jsx'
+import { PhotoGalleryStrip, RecognitionStrip } from './components/RecognitionStrip.jsx'
 import { DailyRevealCard, QAScoresPanel } from './components/SharedMediaPanels.jsx'
 import { TemplatePanel } from './components/TemplatePanel.jsx'
 import { Toast } from './components/Toast.jsx'
@@ -178,6 +178,18 @@ function App() {
         </div>
 
         <RecognitionStrip recognition={sharedContent.recognition} />
+        <PhotoGalleryStrip
+          title="Kudos"
+          subtitle="Shared praise and moments worth celebrating. Hover a photo to magnify; click for a closer look."
+          items={sharedContent.kudos || []}
+          sectionId="kudos"
+        />
+        <PhotoGalleryStrip
+          title="Sharecare Family Moments"
+          subtitle="Team memories and shared moments. Hover a photo to magnify; click for a closer look."
+          items={sharedContent.familyMoments || []}
+          sectionId="sharecare-family-moments"
+        />
       </main>
 
       <AppFooter />

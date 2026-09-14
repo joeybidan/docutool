@@ -45,6 +45,24 @@ const mapRecognition = (row, client) => {
   }
 }
 
+const mapPhotoGalleryItem = (row, client) => {
+  const imagePath = row.image_path || null
+  const imageUrl = imagePath
+    ? client.storage.from(RECOGNITION_BUCKET).getPublicUrl(imagePath).data.publicUrl
+    : ''
+
+  return {
+    id: row.id,
+    gallery: row.gallery,
+    title: row.title || '',
+    caption: row.caption || '',
+    imagePath,
+    imageUrl,
+    sortOrder: row.sort_order ?? 0,
+    isPublished: row.is_published ?? true,
+  }
+}
+
 const mapDashboardMedia = (row, client) => {
   const imagePath = row.image_path || null
   const imageUrl = imagePath
@@ -71,6 +89,14 @@ function dashboardMediaObject(rows, client) {
   return result
 }
 
+function splitPhotoGalleries(rows, client) {
+  const mapped = (rows || []).map((row) => mapPhotoGalleryItem(row, client))
+  return {
+    kudos: mapped.filter((item) => item.gallery === 'kudos'),
+    familyMoments: mapped.filter((item) => item.gallery === 'sharecare_family_moments'),
+  }
+}
+
 export async function loadSharedContent() {
   if (!isSupabaseConfigured) {
     return {
@@ -78,12 +104,14 @@ export async function loadSharedContent() {
       links: FALLBACK_LINKS,
       recognition: FALLBACK_RECOGNITION,
       dashboardMedia: FALLBACK_DASHBOARD_MEDIA,
+      kudos: [],
+      familyMoments: [],
       source: 'preview',
     }
   }
 
   const client = getSupabaseClient()
-  const [announcementsResult, linksResult, recognitionResult, mediaResult] = await Promise.all([
+  const [announcementsResult, linksResult, recognitionResult, mediaResult, galleryResult] = await Promise.all([
     client
       .from('announcements')
       .select('id,title,message,published_at,sort_order,is_published,created_at')
@@ -104,11 +132,22 @@ export async function loadSharedContent() {
       .from('dashboard_media')
       .select('slot,image_path,answer,reveal_at,is_published')
       .eq('is_published', true),
+    client
+      .from('photo_gallery_items')
+      .select('id,gallery,title,caption,image_path,sort_order,is_published')
+      .eq('is_published', true)
+      .order('sort_order')
+      .order('created_at', { ascending: false }),
   ])
 
   const firstError = announcementsResult.error || linksResult.error || recognitionResult.error || null
   if (firstError) throw firstError
   if (mediaResult.error) console.warn('Dashboard media is not available yet.', mediaResult.error)
+  if (galleryResult.error) console.warn('Photo galleries are not available yet.', galleryResult.error)
+
+  const galleries = galleryResult.error
+    ? { kudos: [], familyMoments: [] }
+    : splitPhotoGalleries(galleryResult.data, client)
 
   return {
     announcements: (announcementsResult.data || []).map(mapAnnouncement),
@@ -117,13 +156,14 @@ export async function loadSharedContent() {
     dashboardMedia: mediaResult.error
       ? FALLBACK_DASHBOARD_MEDIA
       : dashboardMediaObject(mediaResult.data, client),
+    ...galleries,
     source: 'supabase',
   }
 }
 
 export async function loadAdminContent() {
   const client = await requireSecureAdmin()
-  const [announcementsResult, linksResult, recognitionResult, mediaResult] = await Promise.all([
+  const [announcementsResult, linksResult, recognitionResult, mediaResult, galleryResult] = await Promise.all([
     client
       .from('announcements')
       .select('id,title,message,published_at,sort_order,is_published,created_at')
@@ -140,10 +180,20 @@ export async function loadAdminContent() {
     client
       .from('dashboard_media')
       .select('slot,image_path,answer,reveal_at,is_published'),
+    client
+      .from('photo_gallery_items')
+      .select('id,gallery,title,caption,image_path,sort_order,is_published')
+      .order('sort_order')
+      .order('created_at', { ascending: false }),
   ])
 
   const firstError = announcementsResult.error || linksResult.error || recognitionResult.error || null
   if (firstError) throw firstError
+  if (galleryResult.error) console.warn('Photo galleries are not available yet.', galleryResult.error)
+
+  const galleries = galleryResult.error
+    ? { kudos: [], familyMoments: [] }
+    : splitPhotoGalleries(galleryResult.data, client)
 
   return {
     announcements: (announcementsResult.data || []).map(mapAnnouncement),
@@ -152,6 +202,7 @@ export async function loadAdminContent() {
     dashboardMedia: mediaResult.error
       ? FALLBACK_DASHBOARD_MEDIA
       : dashboardMediaObject(mediaResult.data, client),
+    ...galleries,
   }
 }
 
@@ -270,6 +321,54 @@ export async function saveRecognition(values, imageFile) {
 export async function deleteRecognition(id, imagePath) {
   const client = await requireSecureAdmin()
   const { error } = await client.from('top_performers').delete().eq('id', id)
+  if (error) throw error
+  if (imagePath) await client.storage.from(RECOGNITION_BUCKET).remove([imagePath])
+}
+
+export async function savePhotoGalleryItem(values, imageFile) {
+  const client = await requireSecureAdmin()
+  let imagePath = values.imagePath || null
+  let uploadedPath = null
+
+  if (imageFile) {
+    uploadedPath = await uploadImage(
+      client,
+      RECOGNITION_BUCKET,
+      imageFile,
+      `galleries/${values.gallery}`,
+    )
+    imagePath = uploadedPath
+  }
+
+  if (!imagePath) throw new Error('Choose a photo before saving.')
+
+  const payload = {
+    gallery: values.gallery,
+    title: values.title?.trim() || null,
+    caption: values.caption?.trim() || null,
+    image_path: imagePath,
+    is_published: values.isPublished ?? true,
+    sort_order: Number(values.sortOrder) || 0,
+  }
+
+  const query = values.id
+    ? client.from('photo_gallery_items').update(payload).eq('id', values.id)
+    : client.from('photo_gallery_items').insert(payload)
+  const { error } = await query
+
+  if (error) {
+    if (uploadedPath) await client.storage.from(RECOGNITION_BUCKET).remove([uploadedPath])
+    throw error
+  }
+
+  if (uploadedPath && values.imagePath) {
+    await client.storage.from(RECOGNITION_BUCKET).remove([values.imagePath])
+  }
+}
+
+export async function deletePhotoGalleryItem(id, imagePath) {
+  const client = await requireSecureAdmin()
+  const { error } = await client.from('photo_gallery_items').delete().eq('id', id)
   if (error) throw error
   if (imagePath) await client.storage.from(RECOGNITION_BUCKET).remove([imagePath])
 }

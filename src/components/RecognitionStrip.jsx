@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Award, X } from 'lucide-react'
+import { Award, Images, X } from 'lucide-react'
 
 function ImageViewer({ src, alt, onClose }) {
   useEffect(() => {
@@ -59,6 +59,29 @@ function RecognitionImage({ item, onOpen }) {
   )
 }
 
+function GalleryImage({ item, onOpen }) {
+  const [failed, setFailed] = useState(false)
+  if (failed || !item.imageUrl) return <span className="recognition-placeholder" aria-hidden="true">IMG</span>
+
+  const label = item.title || item.caption || 'Shared photo'
+  return (
+    <button
+      type="button"
+      className="recognition-image-button"
+      onClick={onOpen}
+      title={`Click to enlarge ${label}`}
+      aria-label={`Open larger photo: ${label}`}
+    >
+      <img
+        src={item.imageUrl}
+        alt={label}
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    </button>
+  )
+}
+
 export function RecognitionStrip({ recognition }) {
   const count = recognition.length
   const [viewerItem, setViewerItem] = useState(null)
@@ -99,6 +122,57 @@ export function RecognitionStrip({ recognition }) {
         <ImageViewer
           src={viewerItem.imageUrl}
           alt={`${viewerItem.employeeName}, ${viewerItem.category}`}
+          onClose={() => setViewerItem(null)}
+        />
+      )}
+    </section>
+  )
+}
+
+export function PhotoGalleryStrip({ title, subtitle, items, sectionId }) {
+  const count = items.length
+  const [viewerItem, setViewerItem] = useState(null)
+  const headingId = `${sectionId}-heading`
+
+  return (
+    <section className="recognition-section" aria-labelledby={headingId}>
+      <div className="recognition-heading">
+        <div>
+          <h2 id={headingId}>{title}</h2>
+          <p>{subtitle}</p>
+        </div>
+        <Images size={20} aria-hidden="true" />
+      </div>
+
+      {count ? (
+        <div
+          className="recognition-gallery"
+          data-layout={count <= 3 ? 'few' : count <= 6 ? 'compact' : 'scroll'}
+        >
+          {items.map((item, index) => {
+            const displayTitle = item.title || `${title} photo ${index + 1}`
+            return (
+              <article className="recognition-card" key={item.id}>
+                <div className="recognition-card__portrait">
+                  <GalleryImage item={item} onOpen={() => item.imageUrl && setViewerItem(item)} />
+                </div>
+                <div className="recognition-card__copy">
+                  <span>{title}</span>
+                  <h3>{displayTitle}</h3>
+                  {item.caption && <p>{item.caption}</p>}
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      ) : (
+        <p className="empty-message">Photos uploaded by the admin will appear here.</p>
+      )}
+
+      {viewerItem?.imageUrl && (
+        <ImageViewer
+          src={viewerItem.imageUrl}
+          alt={viewerItem.title || viewerItem.caption || title}
           onClose={() => setViewerItem(null)}
         />
       )}
