@@ -4,11 +4,12 @@ import { AppFooter } from './components/AppFooter.jsx'
 import { AudioCapture } from './components/AudioCapture.jsx'
 import { CallbackList } from './components/CallbackList.jsx'
 import { Header } from './components/Header.jsx'
+import { HealthcareNewsPanel } from './components/HealthcareNewsPanel.jsx'
 import { InfoPanel } from './components/InfoPanel.jsx'
 import { KnowledgeBaseSearch } from './components/KnowledgeBaseSearch.jsx'
 import { NotesWorkspace } from './components/NotesWorkspace.jsx'
 import { PhotoGalleryStrip, RecognitionStrip } from './components/RecognitionStrip.jsx'
-import { DailyRevealCard, QAScoresPanel } from './components/SharedMediaPanels.jsx'
+import { CSATScoresPanel, DailyRevealCard, QAScoresPanel } from './components/SharedMediaPanels.jsx'
 import { TemplatePanel } from './components/TemplatePanel.jsx'
 import { Toast } from './components/Toast.jsx'
 import { NOTE_LABELS } from './constants/defaults.js'
@@ -21,6 +22,7 @@ import {
   formatCallbackBlock,
   formatTemplateBlock,
 } from './utils/text.js'
+import './feature-updates.css'
 
 function App() {
   const {
@@ -141,6 +143,7 @@ function App() {
               onStatusChange={setCallbackStatus}
               onNotify={notify}
             />
+            <HealthcareNewsPanel />
           </div>
 
           <div className="center-column">
@@ -162,6 +165,7 @@ function App() {
             />
             <KnowledgeBaseSearch />
             <QAScoresPanel item={media.qa_scores_rank_mtd} />
+            <CSATScoresPanel item={media.csat_mtd} />
           </div>
 
           <div className="right-column">

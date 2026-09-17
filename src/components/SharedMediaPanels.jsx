@@ -61,17 +61,38 @@ function MediaImage({ item, alt, hoverMagnify = false }) {
   )
 }
 
-export function QAScoresPanel({ item }) {
+export function MonthlyScoresPanel({ title, subtitle, item }) {
+  const titleId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-title`
   return (
-    <section className="panel shared-media-panel qa-scores-panel" aria-labelledby="qa-scores-title">
+    <section className="panel shared-media-panel monthly-scores-panel" aria-labelledby={titleId}>
       <div className="panel-heading">
         <div>
-          <h2 id="qa-scores-title">QA Scores Rank MTD</h2>
-          <p className="panel-subtitle">Monthly QA ranking uploaded by the admin.</p>
+          <h2 id={titleId}>{title}</h2>
+          <p className="panel-subtitle">{subtitle}</p>
         </div>
       </div>
-      <MediaImage item={item} alt="QA Scores Rank MTD" hoverMagnify />
+      <MediaImage item={item} alt={title} hoverMagnify />
     </section>
+  )
+}
+
+export function QAScoresPanel({ item }) {
+  return (
+    <MonthlyScoresPanel
+      title="QA Scores Rank MTD"
+      subtitle="Monthly QA ranking uploaded by the admin."
+      item={item}
+    />
+  )
+}
+
+export function CSATScoresPanel({ item }) {
+  return (
+    <MonthlyScoresPanel
+      title="CSAT MTD"
+      subtitle="Current month CSAT scores uploaded by the admin."
+      item={item}
+    />
   )
 }
 

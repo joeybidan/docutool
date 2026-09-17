@@ -5,6 +5,7 @@ import { Button } from '../ui/Button.jsx'
 
 const SLOT_CONFIG = [
   { slot: 'qa_scores_rank_mtd', label: 'QA Scores Rank MTD', needsAnswer: false },
+  { slot: 'csat_mtd', label: 'CSAT MTD', needsAnswer: false },
   { slot: 'puzzle_of_day', label: 'Puzzle of the Day', needsAnswer: true },
   { slot: 'caregiver_of_day', label: 'Caregiver of the Day', needsAnswer: true },
   { slot: 'sop_quiz_of_day', label: 'SOP Quiz of the Day', needsAnswer: true },

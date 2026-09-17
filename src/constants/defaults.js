@@ -92,6 +92,14 @@ export const FALLBACK_DASHBOARD_MEDIA = {
     revealAt: null,
     isPublished: true,
   },
+  csat_mtd: {
+    slot: 'csat_mtd',
+    imagePath: null,
+    imageUrl: '',
+    answer: '',
+    revealAt: null,
+    isPublished: true,
+  },
   puzzle_of_day: {
     slot: 'puzzle_of_day',
     imagePath: null,
