@@ -1,5 +1,6 @@
 import { Settings } from 'lucide-react'
 import { HourlyQuote } from './HourlyQuote.jsx'
+import { QuickAccessLinks } from './QuickAccessLinks.jsx'
 import { Button } from './ui/Button.jsx'
 import { TimezoneClocks } from './TimezoneClocks.jsx'
 import { VisitorCounter } from './VisitorCounter.jsx'
@@ -15,6 +16,8 @@ export function Header({ onOpenAdmin }) {
         <VisitorCounter />
       </div>
 
+      <QuickAccessLinks />
+
       <div className="header-utilities">
         <TimezoneClocks />
         <Button variant="ghost" size="small" onClick={onOpenAdmin}>
@@ -25,4 +28,3 @@ export function Header({ onOpenAdmin }) {
     </header>
   )
 }
-
