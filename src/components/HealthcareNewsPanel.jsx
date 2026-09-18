@@ -1,5 +1,7 @@
-import { ExternalLink, Newspaper } from 'lucide-react'
-import { HEALTHCARE_NEWS, HEALTHCARE_NEWS_UPDATED_AT } from '../constants/healthcareNews.js'
+import { ExternalLink, Newspaper, Search } from 'lucide-react'
+import { CARELINX_NEWS, CARELINX_NEWS_UPDATED_AT } from '../constants/healthcareNews.js'
+
+const GOOGLE_NEWS_CARELINX = 'https://news.google.com/search?q=CareLinx&hl=en-US&gl=US&ceid=US%3Aen'
 
 function formatDate(value) {
   return new Intl.DateTimeFormat('en-US', {
@@ -16,31 +18,44 @@ function formatUpdatedAt(value) {
   }).format(new Date(value))
 }
 
-export function HealthcareNewsPanel() {
+export function CarelinxNewsPanel() {
   return (
-    <section className="panel healthcare-news-panel" aria-labelledby="healthcare-news-title">
+    <section className="panel healthcare-news-panel carelinx-news-panel" aria-labelledby="carelinx-news-title">
       <div className="panel-heading">
         <div>
-          <h2 id="healthcare-news-title">US Healthcare News</h2>
-          <p className="panel-subtitle">USA, California, and Washington updates relevant to healthcare support.</p>
+          <h2 id="carelinx-news-title">CareLinx News</h2>
+          <p className="panel-subtitle">CareLinx mentions, caregiver travel alerts, and CA/WA caregiver-law updates.</p>
         </div>
         <Newspaper size={18} aria-hidden="true" />
       </div>
 
+      <a
+        className="carelinx-google-news-link"
+        href={GOOGLE_NEWS_CARELINX}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Search current Google News results for CareLinx"
+      >
+        <Search size={13} aria-hidden="true" />
+        <span>Live Google News search: CareLinx</span>
+        <ExternalLink size={12} aria-hidden="true" />
+      </a>
+
       <div className="healthcare-news-list">
-        {HEALTHCARE_NEWS.slice(0, 20).map((item) => (
+        {CARELINX_NEWS.slice(0, 20).map((item) => (
           <a
             key={`${item.date}-${item.title}`}
             className="healthcare-news-item"
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            title={`Open ${item.source} article in a new tab`}
+            title={`Open ${item.source} in a new tab`}
           >
             <div className="healthcare-news-item__meta">
-              <span className={`healthcare-news-region healthcare-news-region--${item.region.toLowerCase().replaceAll(' ', '-')}`}>
-                {item.region}
+              <span className={`carelinx-news-type carelinx-news-type--${item.type.toLowerCase().replaceAll(' ', '-')}`}>
+                {item.type}
               </span>
+              {item.region && <span>{item.region}</span>}
               <span>{formatDate(item.date)}</span>
               <span>{item.source}</span>
             </div>
@@ -52,7 +67,7 @@ export function HealthcareNewsPanel() {
         ))}
       </div>
 
-      <p className="healthcare-news-footer">Curated for September 2026 • updated {formatUpdatedAt(HEALTHCARE_NEWS_UPDATED_AT)}</p>
+      <p className="healthcare-news-footer">Operational watchlist • refreshed {formatUpdatedAt(CARELINX_NEWS_UPDATED_AT)}</p>
     </section>
   )
 }

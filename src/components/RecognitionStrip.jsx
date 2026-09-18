@@ -29,7 +29,7 @@ function ImageViewer({ src, alt, onClose }) {
   )
 }
 
-function RecognitionImage({ item, onOpen }) {
+function RecognitionImage({ item, onOpen, isClone = false }) {
   const [failed, setFailed] = useState(false)
   const initials = item.employeeName
     .split(' ')
@@ -48,10 +48,11 @@ function RecognitionImage({ item, onOpen }) {
       onClick={onOpen}
       title={`Click to enlarge ${item.employeeName}'s recognition photo`}
       aria-label={`Open larger recognition photo for ${item.employeeName}`}
+      tabIndex={isClone ? -1 : 0}
     >
       <img
         src={item.imageUrl}
-        alt={`${item.employeeName}, ${item.category}`}
+        alt={isClone ? '' : `${item.employeeName}, ${item.category}`}
         loading="lazy"
         onError={() => setFailed(true)}
       />
@@ -59,7 +60,7 @@ function RecognitionImage({ item, onOpen }) {
   )
 }
 
-function GalleryImage({ item, onOpen }) {
+function GalleryImage({ item, onOpen, isClone = false }) {
   const [failed, setFailed] = useState(false)
   if (failed || !item.imageUrl) return <span className="recognition-placeholder" aria-hidden="true">IMG</span>
 
@@ -71,14 +72,37 @@ function GalleryImage({ item, onOpen }) {
       onClick={onOpen}
       title={`Click to enlarge ${label}`}
       aria-label={`Open larger photo: ${label}`}
+      tabIndex={isClone ? -1 : 0}
     >
       <img
         src={item.imageUrl}
-        alt={label}
+        alt={isClone ? '' : label}
         loading="lazy"
         onError={() => setFailed(true)}
       />
     </button>
+  )
+}
+
+function RouletteTrack({ items, direction, renderCard }) {
+  const shouldAnimate = items.length > 1
+  const repeatedItems = shouldAnimate
+    ? [
+        ...items.map((item) => ({ item, isClone: false, key: `primary-${item.id}` })),
+        ...items.map((item) => ({ item, isClone: true, key: `clone-${item.id}` })),
+      ]
+    : items.map((item) => ({ item, isClone: false, key: `primary-${item.id}` }))
+
+  return (
+    <div
+      className="photo-roulette-viewport"
+      data-direction={direction}
+      data-animated={shouldAnimate ? 'true' : 'false'}
+    >
+      <div className="recognition-gallery photo-roulette-track" data-layout="scroll">
+        {repeatedItems.map(({ item, isClone, key }) => renderCard(item, isClone, key))}
+      </div>
+    </div>
   )
 }
 
@@ -91,20 +115,23 @@ export function RecognitionStrip({ recognition }) {
       <div className="recognition-heading">
         <div>
           <h2 id="recognition-heading">Team Recognition</h2>
-          <p>Celebrating thoughtful work and excellent service. Hover a photo to magnify; click for a closer look.</p>
+          <p>Celebrating thoughtful work and excellent service. Hover to pause and magnify; click for a closer look.</p>
         </div>
         <Award size={20} aria-hidden="true" />
       </div>
 
       {count ? (
-        <div
-          className="recognition-gallery"
-          data-layout={count <= 3 ? 'few' : count <= 6 ? 'compact' : 'scroll'}
-        >
-          {recognition.map((item) => (
-            <article className="recognition-card" key={item.id}>
+        <RouletteTrack
+          items={recognition}
+          direction="left-to-right"
+          renderCard={(item, isClone, key) => (
+            <article className="recognition-card" key={key} aria-hidden={isClone || undefined}>
               <div className="recognition-card__portrait">
-                <RecognitionImage item={item} onOpen={() => item.imageUrl && setViewerItem(item)} />
+                <RecognitionImage
+                  item={item}
+                  isClone={isClone}
+                  onOpen={() => item.imageUrl && setViewerItem(item)}
+                />
               </div>
               <div className="recognition-card__copy">
                 <span>{item.category}</span>
@@ -112,8 +139,8 @@ export function RecognitionStrip({ recognition }) {
                 {item.caption && <p>{item.caption}</p>}
               </div>
             </article>
-          ))}
-        </div>
+          )}
+        />
       ) : (
         <p className="empty-message">Recognition updates will appear here.</p>
       )}
@@ -129,7 +156,7 @@ export function RecognitionStrip({ recognition }) {
   )
 }
 
-export function PhotoGalleryStrip({ title, subtitle, items, sectionId }) {
+export function PhotoGalleryStrip({ title, subtitle, items, sectionId, direction = 'right-to-left' }) {
   const count = items.length
   const [viewerItem, setViewerItem] = useState(null)
   const headingId = `${sectionId}-heading`
@@ -145,16 +172,20 @@ export function PhotoGalleryStrip({ title, subtitle, items, sectionId }) {
       </div>
 
       {count ? (
-        <div
-          className="recognition-gallery"
-          data-layout={count <= 3 ? 'few' : count <= 6 ? 'compact' : 'scroll'}
-        >
-          {items.map((item, index) => {
+        <RouletteTrack
+          items={items}
+          direction={direction}
+          renderCard={(item, isClone, key) => {
+            const index = items.findIndex((candidate) => candidate.id === item.id)
             const displayTitle = item.title || `${title} photo ${index + 1}`
             return (
-              <article className="recognition-card" key={item.id}>
+              <article className="recognition-card" key={key} aria-hidden={isClone || undefined}>
                 <div className="recognition-card__portrait">
-                  <GalleryImage item={item} onOpen={() => item.imageUrl && setViewerItem(item)} />
+                  <GalleryImage
+                    item={item}
+                    isClone={isClone}
+                    onOpen={() => item.imageUrl && setViewerItem(item)}
+                  />
                 </div>
                 <div className="recognition-card__copy">
                   <span>{title}</span>
@@ -163,8 +194,8 @@ export function PhotoGalleryStrip({ title, subtitle, items, sectionId }) {
                 </div>
               </article>
             )
-          })}
-        </div>
+          }}
+        />
       ) : (
         <p className="empty-message">Photos uploaded by the admin will appear here.</p>
       )}
