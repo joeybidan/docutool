@@ -8,7 +8,8 @@
   padding: 0 4px;
 }
 
-.quick-access-links a {
+.quick-access-links a,
+.quick-access-links button {
   display: inline-flex;
   align-items: center;
   min-height: 30px;
@@ -22,20 +23,44 @@
   line-height: 1;
   text-decoration: none;
   white-space: nowrap;
+  cursor: pointer;
   transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease,
     transform 140ms ease;
 }
 
-.quick-access-links a:hover {
+.quick-access-links a:hover,
+.quick-access-links button:hover {
   border-color: #9bbbe7;
   background: var(--primary-soft);
   color: var(--primary-dark);
   transform: translateY(-1px);
 }
 
-.healthcare-news-panel {
+.healthcare-news-panel,
+.teams-channels-panel {
   min-width: 0;
   padding: 14px;
+}
+
+.carelinx-google-news-link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 8px 9px;
+  border: 1px solid #bad0ef;
+  border-radius: 7px;
+  background: #f3f8ff;
+  color: #1d4f91;
+  font-size: 10.5px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.carelinx-google-news-link:hover {
+  border-color: #7ea8df;
+  background: #eaf3ff;
 }
 
 .healthcare-news-list {
@@ -68,7 +93,8 @@
   font-size: 10px;
 }
 
-.healthcare-news-region {
+.healthcare-news-region,
+.carelinx-news-type {
   display: inline-flex;
   align-items: center;
   min-height: 18px;
@@ -81,14 +107,19 @@
   letter-spacing: 0.02em;
 }
 
-.healthcare-news-region--california {
+.carelinx-news-type--travel-alert {
   background: #fff4e8;
   color: #9a5a08;
 }
 
-.healthcare-news-region--washington {
+.carelinx-news-type--caregiver-law {
   background: #ebf8f3;
   color: #08775a;
+}
+
+.carelinx-news-type--carelinx {
+  background: #f0edff;
+  color: #5b3fa3;
 }
 
 .healthcare-news-item__headline {
@@ -114,8 +145,193 @@
   line-height: 1.35;
 }
 
+.teams-channels-heading {
+  align-items: center;
+}
+
+.teams-mini-logo {
+  position: relative;
+  display: inline-grid;
+  width: 24px;
+  height: 22px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 5px;
+  background: #6264a7;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.teams-mini-logo i,
+.teams-mini-logo b {
+  position: absolute;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #7b83eb;
+}
+
+.teams-mini-logo i {
+  top: -3px;
+}
+
+.teams-mini-logo b {
+  bottom: -3px;
+}
+
+.teams-channel-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 11px;
+}
+
+.teams-channel-link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: #fff;
+  color: #283a55;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.teams-channel-link:hover {
+  border-color: #a9aee5;
+  background: #f7f7ff;
+  color: #464b91;
+}
+
+.teams-channel-link .teams-mini-logo {
+  width: 20px;
+  height: 19px;
+  font-size: 9px;
+}
+
+.teams-channel-note {
+  margin: 9px 0 0;
+  color: var(--text-faint);
+  font-size: 9.5px;
+  line-height: 1.35;
+}
+
 .monthly-scores-panel {
   min-width: 0;
+}
+
+/* Photo roulettes: 20% larger cards, slow alternating motion, pause and magnify on hover. */
+.photo-roulette-viewport {
+  position: relative;
+  overflow: hidden;
+  padding: 20px 4px;
+}
+
+.photo-roulette-track {
+  display: flex !important;
+  width: max-content;
+  max-width: none;
+  flex-wrap: nowrap;
+  justify-content: flex-start !important;
+  gap: 14px;
+  overflow: visible !important;
+  scroll-snap-type: none !important;
+  will-change: transform;
+}
+
+.photo-roulette-viewport[data-animated='true'][data-direction='right-to-left'] .photo-roulette-track {
+  animation: docutool-roulette-rtl 135s linear infinite;
+}
+
+.photo-roulette-viewport[data-animated='true'][data-direction='left-to-right'] .photo-roulette-track {
+  animation: docutool-roulette-ltr 135s linear infinite;
+}
+
+.photo-roulette-viewport:hover .photo-roulette-track,
+.photo-roulette-viewport:focus-within .photo-roulette-track {
+  animation-play-state: paused;
+}
+
+.photo-roulette-track .recognition-card,
+.photo-roulette-track[data-layout='scroll'] .recognition-card {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  width: 374px;
+  min-width: 312px;
+  max-width: 468px;
+  flex: 0 0 374px;
+  gap: 15px;
+  padding: 12px 16px 12px 12px;
+  overflow: visible;
+}
+
+.photo-roulette-track .recognition-card__portrait {
+  position: relative;
+  z-index: 1;
+  width: 86px;
+  overflow: visible;
+}
+
+.photo-roulette-track .recognition-image-button {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: zoom-in;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  transform-origin: center;
+}
+
+.photo-roulette-track .recognition-image-button:hover,
+.photo-roulette-track .recognition-image-button:focus-visible {
+  z-index: 20;
+  transform: scale(1.55);
+  box-shadow: 0 14px 40px rgb(15 23 42 / 0.28);
+}
+
+.photo-roulette-track .recognition-image-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes docutool-roulette-rtl {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - 7px));
+  }
+}
+
+@keyframes docutool-roulette-ltr {
+  from {
+    transform: translateX(calc(-50% - 7px));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-roulette-track {
+    animation: none !important;
+  }
 }
 
 @media (min-width: 1301px) {
@@ -129,6 +345,15 @@
   }
 }
 
+@media (max-width: 1500px) {
+  .quick-access-links {
+    max-width: 610px;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 2px;
+  }
+}
+
 @media (max-width: 1300px) {
   .app-header {
     flex-wrap: wrap;
@@ -137,6 +362,7 @@
   .quick-access-links {
     order: 3;
     width: 100%;
+    max-width: none;
     justify-content: flex-start;
     overflow-x: auto;
     padding-bottom: 2px;
@@ -144,7 +370,8 @@
 }
 
 @media (max-width: 760px) {
-  .quick-access-links a {
+  .quick-access-links a,
+  .quick-access-links button {
     min-height: 28px;
     padding: 0 9px;
     font-size: 10px;
@@ -152,5 +379,13 @@
 
   .healthcare-news-list {
     max-height: 360px;
+  }
+
+  .photo-roulette-track .recognition-card,
+  .photo-roulette-track[data-layout='scroll'] .recognition-card {
+    grid-template-columns: 82px minmax(0, 1fr);
+    min-width: 330px;
+    width: 330px;
+    flex-basis: 330px;
   }
 }
