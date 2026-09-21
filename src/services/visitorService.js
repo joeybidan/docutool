@@ -1,34 +1,63 @@
 import { getSupabaseClient, isSupabaseConfigured } from './supabaseClient.js'
 
-const VISITOR_SESSION_KEY = 'docutool:visitor-session:v1'
-let visitPromise = null
+const DEVICE_ID_KEY = 'docutool:device-id:v1'
+const PRESENCE_CHANNEL = 'docutool-online-devices-v1'
 
-function getSessionId() {
-  const existing = window.sessionStorage.getItem(VISITOR_SESSION_KEY)
+function getDeviceId() {
+  const existing = window.localStorage.getItem(DEVICE_ID_KEY)
   if (existing) return existing
 
-  const sessionId = crypto.randomUUID()
-  window.sessionStorage.setItem(VISITOR_SESSION_KEY, sessionId)
-  return sessionId
+  const deviceId = crypto.randomUUID()
+  window.localStorage.setItem(DEVICE_ID_KEY, deviceId)
+  return deviceId
 }
 
-export async function recordVisitorSession() {
-  if (!isSupabaseConfigured) return null
-  if (visitPromise) return visitPromise
+function countUniqueDevices(channel) {
+  return Object.keys(channel.presenceState()).length
+}
 
-  visitPromise = (async () => {
-    const client = getSupabaseClient()
-    const { data, error } = await client.rpc('record_docutool_visit', {
-      p_session_id: getSessionId(),
+export function subscribeToOnlineDeviceCount(onCount, onError) {
+  if (!isSupabaseConfigured) {
+    onCount(null)
+    return () => {}
+  }
+
+  const client = getSupabaseClient()
+  const deviceId = getDeviceId()
+  const channel = client.channel(PRESENCE_CHANNEL, {
+    config: {
+      presence: {
+        key: deviceId,
+      },
+    },
+  })
+
+  const syncCount = () => onCount(countUniqueDevices(channel))
+
+  channel
+    .on('presence', { event: 'sync' }, syncCount)
+    .on('presence', { event: 'join' }, syncCount)
+    .on('presence', { event: 'leave' }, syncCount)
+    .subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        const { error } = await channel.track({
+          device_id: deviceId,
+          online_at: new Date().toISOString(),
+        })
+        if (error) {
+          onError(error)
+          return
+        }
+        syncCount()
+      }
+
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        onError(new Error('Realtime visitor presence is unavailable.'))
+      }
     })
-    if (error) throw error
-    return typeof data === 'number' ? data : Number(data)
-  })()
 
-  try {
-    return await visitPromise
-  } catch (error) {
-    visitPromise = null
-    throw error
+  return () => {
+    channel.untrack().catch(() => {})
+    client.removeChannel(channel)
   }
 }
