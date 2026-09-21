@@ -10,6 +10,7 @@ import { AdminContentManager } from './AdminContentManager.jsx'
 import { DashboardMediaManager } from './DashboardMediaManager.jsx'
 import { PhotoGalleryManager } from './PhotoGalleryManager.jsx'
 import { RecognitionManager } from './RecognitionManager.jsx'
+import { SuggestionsManager } from './SuggestionsManager.jsx'
 import { Button } from '../ui/Button.jsx'
 
 const ADMIN_TABS = [
@@ -18,6 +19,7 @@ const ADMIN_TABS = [
   { id: 'recognition', label: 'Recognition' },
   { id: 'kudos', label: 'Kudos' },
   { id: 'family-moments', label: 'Family Moments' },
+  { id: 'suggestions', label: 'Suggestions' },
   { id: 'dashboard-media', label: 'Dashboard Media' },
 ]
 
@@ -127,7 +129,7 @@ export function AdminModal({ sharedContent, onRefresh, onNotify, onClose }) {
         <header className="admin-modal__header">
           <div>
             <h2 id="admin-modal-title">Manage shared content</h2>
-            <p>Announcements, SOP & Trainings, recognition, photo roulettes, and dashboard images</p>
+            <p>Announcements, SOP & Trainings, recognition, suggestions, photo roulettes, and dashboard images</p>
           </div>
           <button className="icon-button" type="button" onClick={onClose} aria-label="Close admin modal">
             <X size={18} />
@@ -269,6 +271,9 @@ export function AdminModal({ sharedContent, onRefresh, onNotify, onClose }) {
                   onRefresh={refreshAdminContent}
                   onNotify={onNotify}
                 />
+              )}
+              {activeTab === 'suggestions' && (
+                <SuggestionsManager onNotify={onNotify} />
               )}
               {activeTab === 'dashboard-media' && (
                 <DashboardMediaManager

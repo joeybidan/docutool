@@ -7,12 +7,12 @@ export function VisitorCounter() {
   return (
     <div
       className={`visitor-counter ${configured ? 'visitor-counter--live' : ''}`}
-      title="Counts unique browser-tab sessions through the shared Supabase visitor service."
-      aria-label={configured ? `${count} shared visitor sessions` : 'Shared visitor count unavailable'}
+      title="Realtime count of unique browser/device profiles currently connected to DocuTool. Multiple tabs on the same browser profile count once."
+      aria-label={configured ? `${count} devices currently online` : 'Realtime visitor count unavailable'}
     >
       <span className="visitor-counter__dot" aria-hidden="true" />
       <strong>{configured ? count.toLocaleString() : '—'}</strong>
-      <span>{configured ? 'sessions' : 'counter offline'}</span>
+      <span>{configured ? 'devices online' : 'counter offline'}</span>
     </div>
   )
 }
