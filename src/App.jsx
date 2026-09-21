@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { AdminModal } from './components/admin/AdminModal.jsx'
+import { AnonymousSuggestions } from './components/AnonymousSuggestions.jsx'
 import { AppFooter } from './components/AppFooter.jsx'
 import { AudioCapture } from './components/AudioCapture.jsx'
 import { CallbackList } from './components/CallbackList.jsx'
@@ -146,6 +147,7 @@ function App() {
             />
             <SCTeamsChannels />
             <CarelinxNewsPanel />
+            <AnonymousSuggestions onNotify={notify} />
           </div>
 
           <div className="center-column">
