@@ -27,7 +27,7 @@ When Supabase is not configured, the app loads clearly labeled preview content. 
 
 Sign in through the existing admin modal, open **Team Spotlight**, and enter the employee's name, optional team and week label, hook, short intro, fun fact, photo, and up to three Q&As. Save a draft and show the preview to the employee. Once they approve the exact text and photo, check the approval box, select **Publish globally**, and save. Editing any content returns the form to draft until approval is confirmed again. The section stays in the center column beneath CSAT MTD; before the first publication it shows a neutral coming-soon message.
 
-The Supabase migration creates a single replaceable spotlight row and a private photo bucket. Only authorized admins can write or read drafts. Published text is globally readable and its photo is served through a temporary signed URL. The week label is display text; admins replace or unpublish the feature when the week ends.
+The Netlify function stores the single replaceable spotlight and its photo in a site-scoped Blob store. It verifies the existing Supabase admin session before writes or draft reads. Published text and photos are globally readable through the function. The week label is display text; admins replace or unpublish the feature when the week ends.
 
 ## Requirements
 

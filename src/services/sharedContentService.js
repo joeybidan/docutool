@@ -192,7 +192,10 @@ export async function loadAdminContent() {
       .select('id,gallery,title,caption,image_path,sort_order,is_published')
       .order('sort_order')
       .order('created_at', { ascending: false }),
-    loadTeamSpotlight(client, true),
+    loadTeamSpotlight(client, true).catch((error) => {
+      console.warn('Team spotlight draft is temporarily unavailable.', error)
+      return null
+    }),
   ])
 
   const firstError = announcementsResult.error || linksResult.error || recognitionResult.error || null

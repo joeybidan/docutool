@@ -38,6 +38,11 @@ export function AdminModal({ sharedContent, onRefresh, onNotify, onClose }) {
   const [passwordError, setPasswordError] = useState('')
   const [adminContent, setAdminContent] = useState(sharedContent)
 
+  useEffect(() => {
+    const url = adminContent.teamSpotlight?.imageUrl
+    return () => { if (url?.startsWith('blob:')) URL.revokeObjectURL(url) }
+  }, [adminContent.teamSpotlight?.imageUrl])
+
   const refreshAdminContent = useCallback(async () => {
     const [secureContent] = await Promise.all([loadAdminContent(), onRefresh()])
     setAdminContent((current) => ({ ...current, ...secureContent }))
