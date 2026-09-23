@@ -201,7 +201,7 @@ Use `--private` instead of `--public` when the repository will contain internal 
 
 ### CareMatch arcade
 
-The dashboard's **CareMatch Arcade** button opens a silent, keyboard and touch friendly 4×4 caregiver matching puzzle. The game chunk loads only after a player opens it. A 2 KB original pixel font is included; there are no audio files or image downloads for the game. The compiled game chunk, CSS, and font together are about 29 KB before compression.
+CareMatch sits directly in a compact dashboard panel with the board, three waiting members, move controls, and the all-time Top 5. Players enter a short alias and play in place with touch or keyboard arrows. The silent game loads as a separate chunk. A 2 KB original pixel font is included; there are no audio files or image downloads for the game. The compiled game chunk, CSS, and font together are under 20 KB before compression.
 
 Ranked players enter a 1–12 character alias (letters, numbers, spaces, dots, dashes, or underscores). The single **global all-time Top 5** displays only the five highest qualifying player scores. There is no weekly reset. Ties favor the round that started first. A browser can have one best entry; aliases identify players on the board but are not employee authentication.
 
