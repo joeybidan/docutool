@@ -86,6 +86,15 @@ test('server recomputes scores, rejects forgery, binds identity and consumes rou
  res=await handleCareMatch(request({op:'submit',round:another.issued.round,actions},''),{store,now});assert.equal(res.status,401)
  res=await handleCareMatch(request({op:'submit',round:another.issued.round,actions},another.cookie),{store,now:now+86400001});assert.equal(res.status,401)
 })
+test('single character and spaced aliases work; markup is rejected',async()=>{
+ const store=memoryStore()
+ const single=await started(store,'J')
+ assert.equal(single.issued.seed >= 0,true)
+ const spaced=await started(store,'AJ B')
+ const invalid=await handleCareMatch(request({op:'start',name:'<script>'}),{store,now})
+ assert.equal(invalid.status,400)
+ assert.ok(spaced.issued.round)
+})
 test('simultaneous submissions preserve Top 5 and prune unqualified scores',async()=>{
  const store=memoryStore()
  const rounds=await Promise.all(Array.from({length:12},(_,i)=>started(store,`P${i}`)))

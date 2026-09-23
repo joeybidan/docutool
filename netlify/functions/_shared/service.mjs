@@ -65,8 +65,8 @@ export async function handleCareMatch(req, { store, scope = 'production', now = 
   if (!body || typeof body !== 'object') return reply({ error: 'Invalid request.' }, 400)
   const rounds = roundPrefix(scope)
   if (body.op === 'start') {
-    const name = typeof body.name === 'string' ? body.name.trim().toUpperCase() : ''
-    if (!/^[A-Z0-9_]{2,10}$/.test(name)) return reply({ error: 'Use 2–10 letters, numbers, or underscores.' }, 400)
+    const name = typeof body.name === 'string' ? body.name.trim().replace(/ +/g, ' ').toUpperCase().normalize('NFC') : ''
+    if (!/^[\p{L}\p{N} _.-]{1,12}$/u.test(name)) return reply({ error: 'Use a short alias of 1–12 letters, numbers, spaces, dots, dashes, or underscores.' }, 400)
     const id = player || randomUUID(), seed = randomBytes(4).readUInt32LE(), round = randomUUID()
     await cleanExpiredRounds(store, rounds, now)
     await store.setJSON(`${rounds}${round}`, { v: RULES_VERSION, seed, player: id, name, scope,

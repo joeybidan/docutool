@@ -82,7 +82,7 @@ export default function CareMatch({ onClose }) {
   }
 
   async function start(practice = false) {
-    if (!/^[A-Z0-9_]{2,10}$/.test(name.trim().toUpperCase())) { setError('Enter 2–10 letters, numbers, or underscores.'); return }
+    if (!/^[\p{L}\p{N} _.-]{1,12}$/u.test(name.trim())) { setError('Enter a short alias of up to 12 characters.'); return }
     if (round && !round.state.ended && !window.confirm('Start a new shift? Your current round will be replaced.')) return
     setBusy(true); setError(''); setNotice('')
     try {
@@ -148,7 +148,7 @@ export default function CareMatch({ onClose }) {
               <h3>HOW TO PLAY</h3><p>Swipe or use arrow keys. Equal tiles merge: 2 → 4 → 8 → 16.</p><p>Select a member, then a sufficient tile. Exact matches earn +100; early matches earn +50. Every third placement adds a streak bonus.</p><p>Only valid swipes use a move. Three missed requests end your shift. After 60 moves, make your final assignments.</p><button className="cm-primary" onClick={() => setHelp(false)}>GOT IT</button>
             </> : paused ? <><h3>SHIFT PAUSED</h3><p>Your board is saved.</p><button className="cm-primary" onClick={() => setPaused(false)}>RESUME</button></> : <>
               <span className="cm-large-heart" aria-hidden="true">♥</span><h3>SMALL MOVES.<br />BIG CARE.</h3><p>Merge coverage. Support members.<br />Make the Top 5.</p>
-              <label className="cm-name-label" htmlFor="cm-name">YOUR ARCADE NAME</label><input id="cm-name" value={name} maxLength={10} autoComplete="off" spellCheck="false" placeholder="E.G. JOEY" onChange={e => setName(e.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, ''))} />
+              <label className="cm-name-label" htmlFor="cm-name">YOUR ARCADE NAME</label><input id="cm-name" value={name} maxLength={12} autoComplete="off" spellCheck="false" placeholder="E.G. JOEY" onChange={e => setName(e.target.value.toUpperCase().replace(/[^\p{L}\p{N} _.-]/gu, ''))} />
               <button className="cm-primary" disabled={busy} onClick={() => start()}>{busy ? 'CONNECTING…' : 'START RANKED SHIFT'}</button>
               <button className="cm-text" disabled={busy} onClick={() => start(true)}>PRACTICE OFFLINE</button>
             </>}</div>}

@@ -203,7 +203,7 @@ Use `--private` instead of `--public` when the repository will contain internal 
 
 The dashboard's **CareMatch Arcade** button opens a silent, keyboard and touch friendly 4×4 caregiver matching puzzle. The game chunk loads only after a player opens it. A 2 KB original pixel font is included; there are no audio files or image downloads for the game. The compiled game chunk, CSS, and font together are about 29 KB before compression.
 
-Ranked players enter a 2–10 character alias (letters, numbers, underscores). The single **global all-time Top 5** displays only the five highest qualifying player scores. There is no weekly reset. Ties favor the round that started first. A browser can have one best entry; aliases identify players on the board but are not employee authentication.
+Ranked players enter a 1–12 character alias (letters, numbers, spaces, dots, dashes, or underscores). The single **global all-time Top 5** displays only the five highest qualifying player scores. There is no weekly reset. Ties favor the round that started first. A browser can have one best entry; aliases identify players on the board but are not employee authentication.
 
 The `/api/carematch` function issues a random 24-hour round identifier, stores a small round seed server-side, and independently replays the submitted actions before saving a score. Completed rounds are deleted; expired abandoned rounds are cleaned up when new games start. Score records that fall out of the Top 5 are deleted. The production function uses a site-scoped Netlify Blobs store so scores persist across production deployments. Branch/deploy previews use a separate deploy-scoped store so test scores do not mix with production. There is no database migration and no game-specific environment variable.
 
@@ -257,4 +257,3 @@ The local Supabase migration could not be executed in this workspace because Doc
 ## Generated sample assets
 
 The three preview recognition portraits are fictional, generated specifically for this project, and stored under `public/recognition/`. Replace them through Supabase Storage when live employee recognition is configured.
-
