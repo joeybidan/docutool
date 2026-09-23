@@ -4,6 +4,7 @@ import { AnonymousSuggestions } from './components/AnonymousSuggestions.jsx'
 import { AppFooter } from './components/AppFooter.jsx'
 import { AudioCapture } from './components/AudioCapture.jsx'
 import { CallbackList } from './components/CallbackList.jsx'
+import { CareMatchLauncher } from './components/CareMatchLauncher.jsx'
 import { Header } from './components/Header.jsx'
 import { CarelinxNewsPanel } from './components/HealthcareNewsPanel.jsx'
 import { InfoPanel } from './components/InfoPanel.jsx'
@@ -182,6 +183,7 @@ function App() {
             <DailyRevealCard title="Puzzle of the Day" item={media.puzzle_of_day} />
             <DailyRevealCard title="Caregiver of the Day" item={media.caregiver_of_day} />
             <DailyRevealCard title="SOP Quiz of the Day" item={media.sop_quiz_of_day} />
+            <CareMatchLauncher />
           </div>
         </div>
 
