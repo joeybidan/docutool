@@ -16,11 +16,18 @@ The app is a clean Vite + React build. Personal working data stays in the browse
 - Slowly auto-scrolling announcements that pause on hover/focus and under reduced motion.
 - Responsive team-recognition gallery with consistent `4 / 5` portrait crops.
 - A shared, idempotent browser-session counter backed by a Supabase RPC.
+- A Team Spotlight below CSAT MTD, with a private draft, approved text/photo, and up to three Q&As.
 - A prototype Admin gate (`000`) with announcements, links, and recognition CRUD interfaces.
 - Live clocks for Cebu City, Eastern, Central, Pacific, and India using IANA time zones.
 - Supabase migration, RLS policies, Storage bucket policy, Netlify configuration, and pinned dependencies.
 
 When Supabase is not configured, the app loads clearly labeled preview content. It never pretends preview data is global, and global writes fail with an explicit secure-auth requirement.
+
+### Weekly Team Spotlight
+
+Sign in through the existing admin modal, open **Team Spotlight**, and enter the employee's name, optional team and week label, hook, short intro, fun fact, photo, and up to three Q&As. Save a draft and show the preview to the employee. Once they approve the exact text and photo, check the approval box, select **Publish globally**, and save. Editing any content returns the form to draft until approval is confirmed again. The section stays in the center column beneath CSAT MTD; before the first publication it shows a neutral coming-soon message.
+
+The Supabase migration creates a single replaceable spotlight row and a private photo bucket. Only authorized admins can write or read drafts. Published text is globally readable and its photo is served through a temporary signed URL. The week label is display text; admins replace or unpublish the feature when the week ends.
 
 ## Requirements
 

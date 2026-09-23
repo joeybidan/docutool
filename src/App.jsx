@@ -15,6 +15,7 @@ import { SCTeamsChannels } from './components/SCTeamsChannels.jsx'
 import { CSATScoresPanel, DailyRevealCard, QAScoresPanel } from './components/SharedMediaPanels.jsx'
 import { TemplatePanel } from './components/TemplatePanel.jsx'
 import { Toast } from './components/Toast.jsx'
+import { TeamSpotlight } from './components/TeamSpotlight.jsx'
 import { NOTE_LABELS } from './constants/defaults.js'
 import { useCallbackList } from './hooks/useCallbackList.js'
 import { useLocalWorkspace } from './hooks/useLocalWorkspace.js'
@@ -171,6 +172,7 @@ function App() {
             <KnowledgeBaseSearch />
             <QAScoresPanel item={media.qa_scores_rank_mtd} />
             <CSATScoresPanel item={media.csat_mtd} />
+            <TeamSpotlight item={sharedContent.teamSpotlight} />
           </div>
 
           <div className="right-column">

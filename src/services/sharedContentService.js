@@ -5,6 +5,7 @@ import {
   FALLBACK_RECOGNITION,
 } from '../constants/defaults.js'
 import { getSupabaseClient, isSupabaseConfigured } from './supabaseClient.js'
+import { loadTeamSpotlight } from './teamSpotlightService.js'
 
 export const RECOGNITION_BUCKET = 'recognition-images'
 export const DASHBOARD_MEDIA_BUCKET = 'dashboard-media'
@@ -106,12 +107,13 @@ export async function loadSharedContent() {
       dashboardMedia: FALLBACK_DASHBOARD_MEDIA,
       kudos: [],
       familyMoments: [],
+      teamSpotlight: null,
       source: 'preview',
     }
   }
 
   const client = getSupabaseClient()
-  const [announcementsResult, linksResult, recognitionResult, mediaResult, galleryResult] = await Promise.all([
+  const [announcementsResult, linksResult, recognitionResult, mediaResult, galleryResult, spotlightResult] = await Promise.all([
     client
       .from('announcements')
       .select('id,title,message,published_at,sort_order,is_published,created_at')
@@ -138,6 +140,10 @@ export async function loadSharedContent() {
       .eq('is_published', true)
       .order('sort_order')
       .order('created_at', { ascending: false }),
+    loadTeamSpotlight(client).catch((error) => {
+      console.warn('Team spotlight is not available yet.', error)
+      return null
+    }),
   ])
 
   const firstError = announcementsResult.error || linksResult.error || recognitionResult.error || null
@@ -156,6 +162,7 @@ export async function loadSharedContent() {
     dashboardMedia: mediaResult.error
       ? FALLBACK_DASHBOARD_MEDIA
       : dashboardMediaObject(mediaResult.data, client),
+    teamSpotlight: spotlightResult,
     ...galleries,
     source: 'supabase',
   }
@@ -163,7 +170,7 @@ export async function loadSharedContent() {
 
 export async function loadAdminContent() {
   const client = await requireSecureAdmin()
-  const [announcementsResult, linksResult, recognitionResult, mediaResult, galleryResult] = await Promise.all([
+  const [announcementsResult, linksResult, recognitionResult, mediaResult, galleryResult, spotlightResult] = await Promise.all([
     client
       .from('announcements')
       .select('id,title,message,published_at,sort_order,is_published,created_at')
@@ -185,6 +192,7 @@ export async function loadAdminContent() {
       .select('id,gallery,title,caption,image_path,sort_order,is_published')
       .order('sort_order')
       .order('created_at', { ascending: false }),
+    loadTeamSpotlight(client, true),
   ])
 
   const firstError = announcementsResult.error || linksResult.error || recognitionResult.error || null
@@ -202,6 +210,7 @@ export async function loadAdminContent() {
     dashboardMedia: mediaResult.error
       ? FALLBACK_DASHBOARD_MEDIA
       : dashboardMediaObject(mediaResult.data, client),
+    teamSpotlight: spotlightResult,
     ...galleries,
   }
 }

@@ -15,6 +15,7 @@ export function useSharedContent() {
     dashboardMedia: FALLBACK_DASHBOARD_MEDIA,
     kudos: [],
     familyMoments: [],
+    teamSpotlight: null,
     source: 'preview',
     loading: true,
     error: null,
@@ -35,6 +36,7 @@ export function useSharedContent() {
         dashboardMedia: FALLBACK_DASHBOARD_MEDIA,
         kudos: [],
         familyMoments: [],
+        teamSpotlight: null,
         source: 'unavailable',
         loading: false,
         error,
@@ -45,6 +47,8 @@ export function useSharedContent() {
 
   useEffect(() => {
     refresh()
+    const timer = window.setInterval(refresh, 45 * 60 * 1000)
+    return () => window.clearInterval(timer)
   }, [refresh])
 
   return { ...state, refresh }
