@@ -1,0 +1,79 @@
+.timezone-tools { display: grid; gap: 7px; min-width: 0; width: 570px; max-width: 100%; }
+.header-utilities { align-items: flex-start; }
+.timezone-tools .timezone-clocks { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: stretch; width: 100%; overflow: visible; }
+.timezone-tools .timezone-clock { min-width: 0; gap: 5px; padding: 7px; }
+.timezone-tools .timezone-clock__copy { min-width: 0; }
+.timezone-tools .timezone-clock time { font-size: 11px; white-space: nowrap; }
+.timezone-tools .timezone-clock__date { display: block; position: static; margin-top: 3px; font-size: 9px; }
+.timezone-clock { cursor: pointer; text-align: left; flex: 1 0 auto; transition: border-color 150ms, box-shadow 150ms; }
+.timezone-clock:hover { border-color: #8eafd8; background: #f5f9ff; }
+.timezone-clock--armed { border-color: #1aa46b; background: #effdf5; box-shadow: 0 0 0 2px #22c55e26, 0 0 12px #22c55e3d; }
+.timezone-clock--armed svg { color: #11874c; }
+.timezone-clock__alarm { margin-top: 4px; color: #137947; font-size: 9px; line-height: 1.35; }
+.timezone-clock--ringing { animation: clock-alarm-blink 1.2s ease-in-out infinite; border-color: #dc3545; background: #fff0f2; }
+.timezone-clock--ringing svg, .timezone-clock--ringing .timezone-clock__alarm { color: #b91c35; }
+@keyframes clock-alarm-blink {
+  0%, 100% { background: #fff0f2; box-shadow: 0 0 0 2px #ef44442e, 0 0 14px #ef444440; }
+  50% { background: #ffcbd2; box-shadow: 0 0 0 3px #ef444466, 0 0 18px #ef444480; }
+}
+.timezone-converter { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; background: #f8fafd; font-size: 11px; }
+.timezone-converter > strong { display: block; margin-bottom: 5px; color: #29486c; font-size: 11px; }
+.timezone-converter__fields { display: grid; grid-template-columns: minmax(80px, 1fr) minmax(160px, 1.8fr) 28px minmax(80px, 1fr); align-items: end; gap: 6px; }
+.timezone-converter label { display: grid; gap: 3px; min-width: 0; color: var(--text-soft); font-size: 10px; }
+.timezone-converter select, .timezone-converter input { min-width: 0; width: 100%; min-height: 30px; padding: 4px 5px; font-size: 11px; }
+.timezone-swap { height: 30px; border: 1px solid var(--border); border-radius: 6px; background: white; cursor: pointer; display: grid; place-items: center; }
+.timezone-converter__result { display: block; margin-top: 6px; color: #194c89; font-weight: 650; font-size: 11px; }
+.timezone-converter__error { display: block; margin: 6px 0 0; color: #b5213c; font-size: 11px; }
+.timezone-occurrence { margin-top: 6px; }
+.alarm-enable-sound { padding: 6px 8px; border: 1px solid #e6bb68; border-radius: 6px; background: #fff8e7; color: #7e5411; cursor: pointer; font-size: 11px; }
+.clock-alarm-alert { padding: 8px; border: 1px solid #ef9baa; border-radius: 8px; background: #fff0f2; color: #96233a; font-size: 12px; }
+.clock-alarm-alert__row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 3px 0; }
+.clock-alarm-alert__row > span { flex: 1 1 180px; overflow-wrap: anywhere; }
+.clock-alarm-alert__row svg { vertical-align: middle; }
+.clock-alarm-alert__row button { background: white; padding: 4px 7px; border: 1px solid #e7a4af; border-radius: 5px; cursor: pointer; font-size: 11px; }
+.clock-alarm-dialog { width: min(440px, calc(100% - 24px)); max-height: calc(100dvh - 40px); margin: auto; overflow: auto; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); box-shadow: 0 20px 80px #11223d40; }
+.clock-alarm-dialog::backdrop { background: #11223d70; }
+.clock-alarm-dialog__heading { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.clock-alarm-dialog h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 18px; }
+.clock-alarm-dialog p { font-size: 12px; }
+.clock-alarm-close { display: grid; place-items: center; padding: 5px; border: 0; border-radius: 5px; background: #f2f5f9; cursor: pointer; }
+.clock-alarm-dialog form > label { display: grid; gap: 5px; margin-top: 12px; font-size: 12px; font-weight: 650; }
+.clock-alarm-dialog input, .clock-alarm-dialog select { width: 100%; min-width: 0; padding: 9px; }
+.clock-alarm-dialog__actions { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 16px; }
+.clock-alarm-preview { color: #194c89; }
+.clock-alarm-help { margin: 16px 0 0; color: var(--text-soft); line-height: 1.6; }
+.holidays-panel { padding: 14px; min-width: 0; }
+.holidays-panel h2 { display: flex; align-items: center; gap: 6px; }
+.holidays-panel .panel-heading { align-items: flex-start; gap: 8px; }
+.holidays-panel .panel-heading select { padding: 4px; font-size: 11px; }
+.holiday-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin-top: 12px; }
+.holiday-column { min-width: 0; }
+.holiday-column + .holiday-column { border-left: 1px solid var(--border); padding-left: 10px; }
+.holiday-column h3 { margin: 0 0 7px; font-size: 11px; color: #24466f; line-height: 1.4; }
+.holiday-column ul { list-style: none; padding: 0; margin: 0 0 8px; }
+.holiday-column li { padding: 6px 0; border-top: 1px solid #edf1f6; font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
+.holiday-column__date { display: block; font-size: 10px; font-weight: 750; color: #294f7f; }
+.holiday-column small { display: block; color: var(--text-soft); font-size: 9px; }
+.holiday-column a, .holidays-panel__note a { color: var(--primary-dark); font-size: 10px; }
+.holidays-panel__note { margin: 10px 0 0; color: var(--text-soft); font-size: 10px; line-height: 1.5; }
+@media (min-width: 1301px) {
+  .app-header .header-utilities { flex: 0 1 auto; }
+  .app-header .brand-group { flex: 1 1 auto; }
+}
+@media (max-width: 1600px) and (min-width: 781px) {
+  .app-header { flex-wrap: wrap; }
+  .quick-access-links { order: 3; width: 100%; max-width: none; justify-content: flex-start; }
+}
+@media (max-width: 780px) {
+  .header-utilities { flex-wrap: wrap; }
+  .timezone-tools { width: 100%; flex: 1 1 100%; }
+  .header-utilities > .button { margin-left: auto; }
+  .timezone-tools .timezone-clocks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: none; overflow: visible; }
+  .timezone-tools .timezone-clock { min-width: 0; padding: 7px; }
+  .timezone-converter__fields { grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr); }
+  .timezone-converter__datetime { grid-column: 1 / -1; grid-row: 1; }
+  .timezone-converter select, .timezone-converter input { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .timezone-clock--ringing { animation: none; background: #ffcbd2; box-shadow: 0 0 0 3px #ef444466; }
+}

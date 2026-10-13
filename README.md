@@ -19,9 +19,20 @@ The app is a clean Vite + React build. Personal working data stays in the browse
 - A Team Spotlight below CSAT MTD, with a private draft, approved text/photo, and up to three Q&As.
 - A prototype Admin gate (`000`) with announcements, links, and recognition CRUD interfaces.
 - Live clocks for Cebu City, Eastern, Central, Pacific, and India using IANA time zones.
+- A timezone converter below the clocks, including date rollover, US daylight saving, and India's half-hour offset.
+- Click any clock to set one personal alarm for that timezone: green when armed, blinking red with a sound when due, with Stop and Snooze 5 min actions.
+- Two-column US federal / Philippine regular holiday calendars for 2026 and 2027 between CareLinx News and Anonymous Suggestions, with official sources and observed US dates.
 - Supabase migration, RLS policies, Storage bucket policy, Netlify configuration, and pinned dependencies.
 
 When Supabase is not configured, the app loads clearly labeled preview content. It never pretends preview data is global, and global writes fail with an explicit secure-auth requirement.
+
+### Timezone tools and alarms
+
+The converter and alarm forms interpret date/time inputs in the selected IANA timezone, independently of the computer's timezone. Times skipped by spring-forward changes are rejected; repeated fall-back times offer a first/second occurrence selector. Converted results include the destination date and timezone abbreviation.
+
+Alarms use local storage key `docutool.clock-alarms.v1` and a versioned payload. They work while DocuTool is open and the device is awake. Browser throttling or device sleep can delay them; overdue alarms ring when the page resumes. Reopening requires a click on **Enable alarm sound** to restore audio permission. Muting the device/browser prevents audible output. **Test sound** plays a short three-tone chime. Reduced-motion users receive a steady red highlight instead of blinking. No backend calls or audio downloads are needed.
+
+The holiday calendar is a maintained reference, not a live feed. Philippine special holidays are excluded; 2027 Eid dates remain TBA until separately proclaimed. Update `src/constants/holidays.js` for new proclamations/years. Validate timezone and alarm behavior with `npm run test:time-tools`.
 
 ### Weekly Team Spotlight
 

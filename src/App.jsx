@@ -6,6 +6,7 @@ import { AudioCapture } from './components/AudioCapture.jsx'
 import { CallbackList } from './components/CallbackList.jsx'
 import { CareMatchLauncher } from './components/CareMatchLauncher.jsx'
 import { Header } from './components/Header.jsx'
+import { HolidaysPanel } from './components/HolidaysPanel.jsx'
 import { CarelinxNewsPanel } from './components/HealthcareNewsPanel.jsx'
 import { InfoPanel } from './components/InfoPanel.jsx'
 import { KnowledgeBaseSearch } from './components/KnowledgeBaseSearch.jsx'
@@ -27,6 +28,7 @@ import {
   formatTemplateBlock,
 } from './utils/text.js'
 import './feature-updates.css'
+import './time-tools.css'
 
 function App() {
   const {
@@ -149,6 +151,7 @@ function App() {
             />
             <SCTeamsChannels />
             <CarelinxNewsPanel />
+            <HolidaysPanel />
             <AnonymousSuggestions onNotify={notify} />
           </div>
 
