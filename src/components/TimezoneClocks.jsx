@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Bell, Clock3 } from 'lucide-react'
+import { Bell, ChevronDown, Clock3 } from 'lucide-react'
 import { formatDateInZone, formatFullDateTimeInZone, formatTimeInZone, TIMEZONES } from '../utils/timezones.js'
 import { CLOCK_ALARMS_KEY, parseClockAlarms, triggerDueAlarms } from '../utils/clockAlarms.js'
 import { useAlarmSound } from '../hooks/useAlarmSound.js'
@@ -12,6 +12,7 @@ export function TimezoneClocks() {
     try { return parseClockAlarms(window.localStorage.getItem(CLOCK_ALARMS_KEY)) } catch { return {} }
   })
   const [editingZone, setEditingZone] = useState(null)
+  const [converterOpen, setConverterOpen] = useState(false)
   const [storageError, setStorageError] = useState(false)
   const ringing = TIMEZONES.filter((zone) => alarms[zone.timeZone]?.status === 'ringing')
   const { soundReady, enableSound, testSound } = useAlarmSound(ringing.length > 0)
@@ -67,7 +68,23 @@ export function TimezoneClocks() {
         </button>
       })}
       </div>
-      <TimezoneConverter />
+      <div className={`timezone-converter-drawer${converterOpen ? ' timezone-converter-drawer--open' : ''}`}>
+        <button
+          type="button"
+          className="timezone-converter-toggle"
+          aria-expanded={converterOpen}
+          aria-controls="timezone-converter-panel"
+          onClick={() => setConverterOpen((current) => !current)}
+        >
+          <span>Timezone converter</span>
+          <ChevronDown size={14} aria-hidden="true" />
+        </button>
+        {converterOpen && (
+          <div id="timezone-converter-panel">
+            <TimezoneConverter />
+          </div>
+        )}
+      </div>
       {Object.keys(alarms).length > 0 && !soundReady && <button type="button" className="alarm-enable-sound" onClick={testSound}>Enable alarm sound (required after reopening)</button>}
       {storageError && <p className="timezone-converter__error" role="status">Browser storage is unavailable. Alarms will last only while this page is open.</p>}
       {ringing.length > 0 && <div className="clock-alarm-alert" role="alert">

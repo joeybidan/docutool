@@ -34,9 +34,17 @@ function clearDocuToolCookies() {
   )
 }
 
-export function QuickAccessLinks() {
+export function QuickAccessLinks({ onOpenMini }) {
   return (
     <nav className="quick-access-links" aria-label="Agent quick access links">
+      <button
+        type="button"
+        className="quick-access-mini"
+        onClick={onOpenMini}
+        title="Open the floating DocuTool Mini checklist"
+      >
+        Open Mini
+      </button>
       {QUICK_LINKS.map((item) => (
         <a
           key={item.label}
