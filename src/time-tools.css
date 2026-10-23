@@ -77,3 +77,46 @@
 @media (prefers-reduced-motion: reduce) {
   .timezone-clock--ringing { animation: none; background: #ffcbd2; box-shadow: 0 0 0 3px #ef444466; }
 }
+
+
+/* Keep the converter available without letting it dominate the header. */
+.timezone-converter-drawer {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+}
+.timezone-converter-toggle {
+  display: flex;
+  min-height: 25px;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #f8fafd;
+  color: #345273;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: left;
+}
+.timezone-converter-toggle:hover {
+  border-color: #9bbbe7;
+  background: #f1f6fd;
+  color: var(--primary-dark);
+}
+.timezone-converter-toggle svg {
+  flex: 0 0 auto;
+  transition: transform 150ms ease;
+}
+.timezone-converter-drawer--open .timezone-converter-toggle svg {
+  transform: rotate(180deg);
+}
+.timezone-converter-drawer .timezone-converter {
+  margin: 0;
+}
+.timezone-converter-drawer .timezone-converter > strong {
+  display: none;
+}
