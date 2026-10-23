@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CheckCheck, Copy, X } from 'lucide-react'
+import { CheckSquare2, Copy, X } from 'lucide-react'
 
 export function DocuToolMini({
   templates,
@@ -84,7 +84,7 @@ export function DocuToolMini({
           disabled={selectedCount === 0}
           onClick={handleUncheck}
         >
-          <CheckCheck size={15} />
+          <CheckSquare2 size={15} />
           Uncheck
         </button>
         <p className={`docutool-mini__status docutool-mini__status--${statusType}`} aria-live="polite">
