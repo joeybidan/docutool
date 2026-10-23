@@ -20,6 +20,7 @@ import { TeamSpotlight } from './components/TeamSpotlight.jsx'
 import { NOTE_LABELS } from './constants/defaults.js'
 import { useCallbackList } from './hooks/useCallbackList.js'
 import { useLocalWorkspace } from './hooks/useLocalWorkspace.js'
+import { useDocuToolMini } from './hooks/useDocuToolMini.js'
 import { useSharedContent } from './hooks/useSharedContent.js'
 import {
   appendTextBlock,
@@ -71,6 +72,27 @@ function App() {
 
   const handleTemplateToggle = (templateId) => toggleSetValue(setSelectedIds, templateId)
   const handleCallbackToggle = (callbackId) => toggleSetValue(setSelectedCallbackIds, callbackId)
+
+  const handleMiniGenerateCopy = useCallback(async () => {
+    if (!selectedTemplates.length) throw new Error('Select at least one note template first.')
+
+    const block = formatTemplateBlock(selectedTemplates)
+    await copyToClipboard(block)
+    updateNote(activeNoteIndex, (current) => appendTextBlock(current, block))
+
+    const message = `${selectedTemplates.length} template${selectedTemplates.length === 1 ? '' : 's'} generated and copied.`
+    notify(message)
+    return `Copied ${selectedTemplates.length} template${selectedTemplates.length === 1 ? '' : 's'} ✓`
+  }, [activeNoteIndex, notify, selectedTemplates, updateNote])
+
+  const { openMini, miniPortal } = useDocuToolMini({
+    templates,
+    selectedIds,
+    onToggle: handleTemplateToggle,
+    onGenerateCopy: handleMiniGenerateCopy,
+    onUncheck: () => setSelectedIds(new Set()),
+    onNotify: notify,
+  })
 
   const handleTemplatesChange = (nextTemplates) => {
     setTemplates(nextTemplates)
@@ -128,7 +150,7 @@ function App() {
 
   return (
     <div className="app-shell">
-      <Header onOpenAdmin={() => setIsAdminOpen(true)} />
+      <Header onOpenAdmin={() => setIsAdminOpen(true)} onOpenMini={openMini} />
 
       <main id="workspace" className="app-main">
         <div className="workspace-grid">
@@ -221,6 +243,7 @@ function App() {
       )}
 
       <Toast toast={toast} onDismiss={() => setToast(null)} />
+      {miniPortal}
     </div>
   )
 }
