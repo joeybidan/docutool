@@ -20,7 +20,7 @@ import { TeamSpotlight } from './components/TeamSpotlight.jsx'
 import { NOTE_LABELS } from './constants/defaults.js'
 import { useCallbackList } from './hooks/useCallbackList.js'
 import { useLocalWorkspace } from './hooks/useLocalWorkspace.js'
-import { useDocuToolMini } from './hooks/useDocuToolMini.js'
+import { useDocuToolMini } from './hooks/useDocuToolMini.jsx'
 import { useSharedContent } from './hooks/useSharedContent.js'
 import {
   appendTextBlock,
