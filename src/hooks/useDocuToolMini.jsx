@@ -20,14 +20,7 @@ function prepareMiniDocument(targetWindow) {
   })
 }
 
-export function useDocuToolMini({
-  templates,
-  selectedIds,
-  onToggle,
-  onGenerateCopy,
-  onUncheck,
-  onNotify,
-}) {
+export function useDocuToolMini({ onNotify, onCopy, ...miniProps }) {
   const [targetWindow, setTargetWindow] = useState(null)
   const [mode, setMode] = useState(null)
   const targetRef = useRef(null)
@@ -75,8 +68,8 @@ export function useDocuToolMini({
     if (window.documentPictureInPicture?.requestWindow) {
       try {
         const pipWindow = await window.documentPictureInPicture.requestWindow({
-          width: 360,
-          height: 620,
+          width: 440,
+          height: 760,
         })
         attachWindow(pipWindow, 'pip')
         return
@@ -88,7 +81,7 @@ export function useDocuToolMini({
     const popup = window.open(
       '',
       'docutool-mini',
-      'popup=yes,width=360,height=620,resizable=yes,scrollbars=yes',
+      'popup=yes,width=440,height=760,resizable=yes,scrollbars=yes',
     )
 
     if (!popup) {
@@ -113,11 +106,8 @@ export function useDocuToolMini({
   const miniPortal = targetWindow
     ? createPortal(
         <DocuToolMini
-          templates={templates}
-          selectedIds={selectedIds}
-          onToggle={onToggle}
-          onGenerateCopy={onGenerateCopy}
-          onUncheck={onUncheck}
+          {...miniProps}
+          onCopy={() => onCopy?.(targetWindow)}
           onClose={closeMini}
           mode={mode}
         />,
