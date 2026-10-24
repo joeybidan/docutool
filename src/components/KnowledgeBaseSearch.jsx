@@ -23,27 +23,30 @@ const COMMON_TERMS = [
   'care advisor',
 ]
 
-const SEARCHES = [
+export const KNOWLEDGE_BASE_SEARCHES = [
   {
     id: 'staffhelp',
+    shortLabel: 'Staffhelp',
     placeholder: 'Staffhelp for agents only',
     baseUrl: 'https://staffhelp.carelinx.com/en/?q=',
   },
   {
     id: 'advice',
+    shortLabel: 'Client Advice',
     placeholder: 'Advice for Clients only',
     baseUrl: 'https://advice.carelinx.com/en/?q=',
   },
   {
     id: 'help',
+    shortLabel: 'Caregiver Help',
     placeholder: 'Help for Caregivers only',
     baseUrl: 'https://help.carelinx.com/en/?q=',
   },
 ]
 
-function SearchRow({ config }) {
+function SearchRow({ config, compact = false }) {
   const [value, setValue] = useState('')
-  const listId = `kb-suggestions-${config.id}`
+  const listId = `kb-suggestions-${compact ? 'mini-' : ''}${config.id}`
   const suggestions = useMemo(() => {
     const query = value.trim().toLowerCase()
     if (!query) return COMMON_TERMS.slice(0, 10)
@@ -54,17 +57,21 @@ function SearchRow({ config }) {
     event.preventDefault()
     const query = value.trim()
     if (!query) return
-    window.open(`${config.baseUrl}${encodeURIComponent(query)}`, '_blank', 'noopener,noreferrer')
+    const hostWindow = event.currentTarget.ownerDocument.defaultView || window
+    hostWindow.open(`${config.baseUrl}${encodeURIComponent(query)}`, '_blank', 'noopener,noreferrer')
   }
 
   return (
-    <form className="knowledge-search-row" onSubmit={submit}>
+    <form
+      className={`knowledge-search-row${compact ? ' knowledge-search-row--compact' : ''}`}
+      onSubmit={submit}
+    >
       <input
         type="search"
         list={listId}
         value={value}
         onChange={(event) => setValue(event.target.value)}
-        placeholder={config.placeholder}
+        placeholder={compact ? `${config.shortLabel}: 3–4 keywords` : config.placeholder}
         aria-label={config.placeholder}
         autoComplete="off"
       />
@@ -78,6 +85,16 @@ function SearchRow({ config }) {
   )
 }
 
+export function KnowledgeSearchRows({ compact = false }) {
+  return (
+    <div className={`knowledge-search-list${compact ? ' knowledge-search-list--compact' : ''}`}>
+      {KNOWLEDGE_BASE_SEARCHES.map((config) => (
+        <SearchRow key={config.id} config={config} compact={compact} />
+      ))}
+    </div>
+  )
+}
+
 export function KnowledgeBaseSearch() {
   return (
     <section className="panel knowledge-base-panel" aria-labelledby="knowledge-base-title">
@@ -87,9 +104,7 @@ export function KnowledgeBaseSearch() {
           <p className="panel-subtitle">Search the correct CareLinx knowledge base without leaving your notes.</p>
         </div>
       </div>
-      <div className="knowledge-search-list">
-        {SEARCHES.map((config) => <SearchRow key={config.id} config={config} />)}
-      </div>
+      <KnowledgeSearchRows />
     </section>
   )
 }

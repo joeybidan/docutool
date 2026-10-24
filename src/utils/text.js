@@ -34,21 +34,42 @@ export function formatCallbackBlock(callbacks) {
     .join('\n')
 }
 
-export async function copyToClipboard(text) {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text)
-    return
+export async function copyToClipboard(text, contextWindow = typeof window !== 'undefined' ? window : null) {
+  if (!contextWindow) throw new Error('Clipboard access is unavailable in this browser.')
+
+  const targetDocument = contextWindow.document
+  let clipboardError = null
+
+  try {
+    if (targetDocument?.hasFocus && !targetDocument.hasFocus()) {
+      contextWindow.focus?.()
+    }
+
+    if (contextWindow.navigator?.clipboard?.writeText) {
+      await contextWindow.navigator.clipboard.writeText(text)
+      return
+    }
+  } catch (error) {
+    clipboardError = error
   }
 
-  const helper = document.createElement('textarea')
+  const helper = targetDocument.createElement('textarea')
   helper.value = text
   helper.setAttribute('readonly', '')
   helper.style.position = 'fixed'
   helper.style.opacity = '0'
-  document.body.appendChild(helper)
+  helper.style.pointerEvents = 'none'
+  targetDocument.body.appendChild(helper)
+  helper.focus()
   helper.select()
-  const successful = document.execCommand('copy')
+  const successful = targetDocument.execCommand?.('copy')
   helper.remove()
 
-  if (!successful) throw new Error('Clipboard access is unavailable in this browser.')
+  if (!successful) {
+    throw new Error(
+      clipboardError?.name === 'NotAllowedError'
+        ? 'Clipboard access was blocked. Click Copy again while DocuTool Mini is focused.'
+        : clipboardError?.message || 'Clipboard access is unavailable in this browser.',
+    )
+  }
 }

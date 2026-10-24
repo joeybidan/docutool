@@ -19,9 +19,10 @@ import { Toast } from './components/Toast.jsx'
 import { TeamSpotlight } from './components/TeamSpotlight.jsx'
 import { NOTE_LABELS } from './constants/defaults.js'
 import { useCallbackList } from './hooks/useCallbackList.js'
-import { useLocalWorkspace } from './hooks/useLocalWorkspace.js'
 import { useDocuToolMini } from './hooks/useDocuToolMini.jsx'
+import { useLocalWorkspace } from './hooks/useLocalWorkspace.js'
 import { useSharedContent } from './hooks/useSharedContent.js'
+import { useSynchronizedAudioCapture } from './hooks/useSynchronizedAudioCapture.js'
 import {
   appendTextBlock,
   copyToClipboard,
@@ -41,6 +42,7 @@ function App() {
     setActiveNoteIndex,
   } = useLocalWorkspace()
   const { callbacks, saveCallback, deleteCallback, setCallbackStatus } = useCallbackList()
+  const audioCapture = useSynchronizedAudioCapture()
   const sharedContent = useSharedContent()
   const [selectedIds, setSelectedIds] = useState(() => new Set())
   const [selectedCallbackIds, setSelectedCallbackIds] = useState(() => new Set())
@@ -73,37 +75,77 @@ function App() {
   const handleTemplateToggle = (templateId) => toggleSetValue(setSelectedIds, templateId)
   const handleCallbackToggle = (callbackId) => toggleSetValue(setSelectedCallbackIds, callbackId)
 
-  const handleMiniGenerateCopy = useCallback(async () => {
-    if (!selectedTemplates.length) throw new Error('Select at least one note template first.')
-
+  const handleMiniGenerate = useCallback(() => {
+    if (!selectedTemplates.length) return ''
     const block = formatTemplateBlock(selectedTemplates)
-    await copyToClipboard(block)
-    updateNote(activeNoteIndex, (current) => appendTextBlock(current, block))
-
-    const message = `${selectedTemplates.length} template${selectedTemplates.length === 1 ? '' : 's'} generated and copied.`
+    updateNote(activeNoteIndex, (currentText) => appendTextBlock(currentText, block))
+    const message = `${selectedTemplates.length} template${selectedTemplates.length === 1 ? '' : 's'} appended to ${NOTE_LABELS[activeNoteIndex]}.`
     notify(message)
-    return `Copied ${selectedTemplates.length} template${selectedTemplates.length === 1 ? '' : 's'} ✓`
+    return message
   }, [activeNoteIndex, notify, selectedTemplates, updateNote])
+
+  const handleMiniCopy = useCallback(async (targetWindow) => {
+    if (!activeNote) return ''
+    await copyToClipboard(activeNote, targetWindow)
+    const message = `${NOTE_LABELS[activeNoteIndex]} copied from DocuTool Mini.`
+    notify(message)
+    return message
+  }, [activeNote, activeNoteIndex, notify])
+
+  const handleMiniClearNote = useCallback(() => {
+    updateNote(activeNoteIndex, '')
+    notify(`${NOTE_LABELS[activeNoteIndex]} cleared.`)
+  }, [activeNoteIndex, notify, updateNote])
+
+  const handleAppendCaptured = useCallback(() => {
+    const captured = audioCapture.capturedText.trim()
+    if (!captured) return
+    updateNote(activeNoteIndex, (currentText) => appendTextBlock(currentText, captured))
+    notify(`Captured conversation appended to ${NOTE_LABELS[activeNoteIndex]}.`)
+  }, [activeNoteIndex, audioCapture.capturedText, notify, updateNote])
+
+  const handleClearCaptured = useCallback(() => {
+    if (
+      audioCapture.capturedText.length > 80 &&
+      !window.confirm('Clear the captured conversation scratchpad?')
+    ) return
+    audioCapture.clearCapturedText()
+  }, [audioCapture])
 
   const { openMini, miniPortal } = useDocuToolMini({
     templates,
     selectedIds,
     onToggle: handleTemplateToggle,
-    onGenerateCopy: handleMiniGenerateCopy,
+    notes,
+    activeNoteIndex,
+    onActiveNoteIndexChange: setActiveNoteIndex,
+    onNoteChange: (value) => updateNote(activeNoteIndex, value),
+    onGenerate: handleMiniGenerate,
+    onCopy: handleMiniCopy,
+    onClearNote: handleMiniClearNote,
     onUncheck: () => setSelectedIds(new Set()),
+    capturedText: audioCapture.capturedText,
+    onCapturedTextChange: audioCapture.setCapturedText,
+    isSpeechSupported: audioCapture.isSupported,
+    isListening: audioCapture.isListening,
+    speechError: audioCapture.error,
+    onStartListening: audioCapture.startListening,
+    onStopListening: audioCapture.stopListening,
+    onClearCaptured: audioCapture.clearCapturedText,
+    onAppendCaptured: handleAppendCaptured,
     onNotify: notify,
   })
 
   const handleTemplatesChange = (nextTemplates) => {
     setTemplates(nextTemplates)
     const validIds = new Set(nextTemplates.map((template) => template.id))
-    setSelectedIds((current) => new Set([...current].filter((id) => validIds.has(id))))
+    setSelectedIds((currentIds) => new Set([...currentIds].filter((id) => validIds.has(id))))
   }
 
   const handleCallbackDelete = (id) => {
     deleteCallback(id)
-    setSelectedCallbackIds((current) => {
-      const next = new Set(current)
+    setSelectedCallbackIds((currentIds) => {
+      const next = new Set(currentIds)
       next.delete(id)
       return next
     })
@@ -115,8 +157,8 @@ function App() {
     if (selectedTemplates.length) blocks.push(formatTemplateBlock(selectedTemplates))
     if (selectedCallbacks.length) blocks.push(formatCallbackBlock(selectedCallbacks))
 
-    updateNote(activeNoteIndex, (current) =>
-      blocks.reduce((note, block) => appendTextBlock(note, block), current),
+    updateNote(activeNoteIndex, (currentText) =>
+      blocks.reduce((note, block) => appendTextBlock(note, block), currentText),
     )
     const total = selectedTemplates.length + selectedCallbacks.length
     notify(`${total} selected item${total === 1 ? '' : 's'} appended to ${NOTE_LABELS[activeNoteIndex]}.`)
@@ -140,10 +182,6 @@ function App() {
   const handleUncheck = () => {
     setSelectedIds(new Set())
     setSelectedCallbackIds(new Set())
-  }
-
-  const appendCapturedText = (capturedText) => {
-    updateNote(activeNoteIndex, (current) => appendTextBlock(current, capturedText))
   }
 
   const media = sharedContent.dashboardMedia || {}
@@ -191,7 +229,15 @@ function App() {
             />
             <AudioCapture
               activeNoteLabel={NOTE_LABELS[activeNoteIndex]}
-              onAppend={appendCapturedText}
+              capturedText={audioCapture.capturedText}
+              onCapturedTextChange={audioCapture.setCapturedText}
+              isSupported={audioCapture.isSupported}
+              isListening={audioCapture.isListening}
+              error={audioCapture.error}
+              onStart={audioCapture.startListening}
+              onStop={audioCapture.stopListening}
+              onClear={handleClearCaptured}
+              onAppend={handleAppendCaptured}
               onNotify={notify}
             />
             <KnowledgeBaseSearch />

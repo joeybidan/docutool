@@ -1,27 +1,20 @@
-import { useCallback, useRef, useState } from 'react'
 import { Copy, Eraser, Mic, Square, TextCursorInput } from 'lucide-react'
-import { useSpeechRecognition } from '../hooks/useSpeechRecognition.js'
 import { copyToClipboard } from '../utils/text.js'
 import { Button } from './ui/Button.jsx'
 
-export function AudioCapture({ activeNoteLabel, onAppend, onNotify }) {
-  const [capturedText, setCapturedText] = useState('')
-  const baseTextRef = useRef('')
-
-  const handleTranscript = useCallback((sessionTranscript) => {
-    const base = baseTextRef.current.trim()
-    setCapturedText(base ? `${base} ${sessionTranscript}` : sessionTranscript)
-  }, [])
-
-  const { isSupported, isListening, error, start, stop } = useSpeechRecognition({
-    onTranscript: handleTranscript,
-  })
-
-  const handleStart = () => {
-    baseTextRef.current = capturedText
-    start()
-  }
-
+export function AudioCapture({
+  activeNoteLabel,
+  capturedText,
+  onCapturedTextChange,
+  isSupported,
+  isListening,
+  error,
+  onStart,
+  onStop,
+  onClear,
+  onAppend,
+  onNotify,
+}) {
   const handleCopy = async () => {
     try {
       await copyToClipboard(capturedText)
@@ -29,18 +22,6 @@ export function AudioCapture({ activeNoteLabel, onAppend, onNotify }) {
     } catch (copyError) {
       onNotify(copyError.message, 'error')
     }
-  }
-
-  const handleClear = () => {
-    if (capturedText.length > 80 && !window.confirm('Clear the captured conversation scratchpad?')) return
-    setCapturedText('')
-    baseTextRef.current = ''
-  }
-
-  const handleAppend = () => {
-    if (!capturedText.trim()) return
-    onAppend(capturedText)
-    onNotify(`Captured conversation appended to ${activeNoteLabel}.`)
   }
 
   return (
@@ -69,7 +50,7 @@ export function AudioCapture({ activeNoteLabel, onAppend, onNotify }) {
       <textarea
         id="captured-conversation"
         value={capturedText}
-        onChange={(event) => setCapturedText(event.target.value)}
+        onChange={(event) => onCapturedTextChange(event.target.value)}
         placeholder="Captured speech or temporary call details will appear here…"
       />
 
@@ -79,12 +60,12 @@ export function AudioCapture({ activeNoteLabel, onAppend, onNotify }) {
           size="small"
           type="button"
           disabled={!isSupported || isListening}
-          onClick={handleStart}
+          onClick={onStart}
         >
           <Mic size={15} />
           Start Listening
         </Button>
-        <Button size="small" type="button" disabled={!isListening} onClick={stop}>
+        <Button size="small" type="button" disabled={!isListening} onClick={onStop}>
           <Square size={13} fill="currentColor" />
           Stop
         </Button>
@@ -92,7 +73,7 @@ export function AudioCapture({ activeNoteLabel, onAppend, onNotify }) {
           <Copy size={14} />
           Copy
         </Button>
-        <Button size="small" type="button" disabled={!capturedText} onClick={handleClear}>
+        <Button size="small" type="button" disabled={!capturedText} onClick={onClear}>
           <Eraser size={14} />
           Clear
         </Button>
@@ -102,10 +83,10 @@ export function AudioCapture({ activeNoteLabel, onAppend, onNotify }) {
           size="small"
           type="button"
           disabled={!capturedText.trim()}
-          onClick={handleAppend}
+          onClick={onAppend}
         >
           <TextCursorInput size={15} />
-          Append to Active Note
+          Append to {activeNoteLabel}
         </Button>
       </div>
     </section>
