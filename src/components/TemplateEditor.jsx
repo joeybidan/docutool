@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, Plus, RotateCcw, Trash2 } from 'lucide-react'
+import { TEMPLATE_GROUPS } from '../constants/defaults.js'
 import { getDefaultTemplates } from '../services/localStorageService.js'
 import { Button } from './ui/Button.jsx'
 
@@ -14,32 +15,52 @@ function moveItem(items, index, direction) {
 
 export function TemplateEditor({ templates, onChange, onDone, onNotify }) {
   const [newPhrase, setNewPhrase] = useState('')
+  const [newGroup, setNewGroup] = useState(TEMPLATE_GROUPS[0].id)
 
   const addPhrase = (event) => {
     event.preventDefault()
     const phrase = newPhrase.trim()
     if (!phrase) return
-    onChange([...templates, { id: `custom-${crypto.randomUUID()}`, text: phrase }])
+    onChange([
+      ...templates,
+      { id: `custom-${crypto.randomUUID()}`, text: phrase, group: newGroup },
+    ])
     setNewPhrase('')
     onNotify('Template phrase added.')
   }
 
   const restoreDefaults = () => {
-    if (!window.confirm('Restore the original DocuTool template phrases?')) return
+    if (!window.confirm('Restore the grouped DocuTool template phrases?')) return
     onChange(getDefaultTemplates())
-    onNotify('Default templates restored.')
+    onNotify('Grouped default templates restored.')
   }
 
   return (
     <div className="template-editor">
-      <p className="panel-subtitle">Changes save only in this browser.</p>
+      <p className="panel-subtitle">Changes save only in this browser. Choose a workflow group for each phrase.</p>
 
       <div className="template-editor__list" aria-label="Editable note template phrases">
         {templates.map((template, index) => (
-          <div className="template-edit-row" key={template.id}>
+          <div className="template-edit-row template-edit-row--grouped" key={template.id}>
             <label className="sr-only" htmlFor={`template-${template.id}`}>
               Template phrase {index + 1}
             </label>
+            <select
+              className="template-edit-row__group"
+              aria-label={`Group for ${template.text}`}
+              value={template.group}
+              onChange={(event) =>
+                onChange(
+                  templates.map((item) =>
+                    item.id === template.id ? { ...item, group: event.target.value } : item,
+                  ),
+                )
+              }
+            >
+              {TEMPLATE_GROUPS.map((group) => (
+                <option key={group.id} value={group.id}>{group.label}</option>
+              ))}
+            </select>
             <textarea
               id={`template-${template.id}`}
               rows="2"
@@ -84,9 +105,18 @@ export function TemplateEditor({ templates, onChange, onDone, onNotify }) {
         ))}
       </div>
 
-      <form className="add-template-form" onSubmit={addPhrase}>
+      <form className="add-template-form add-template-form--grouped" onSubmit={addPhrase}>
         <label htmlFor="new-template">Add template phrase</label>
-        <div>
+        <div className="add-template-form__controls">
+          <select
+            aria-label="Template group"
+            value={newGroup}
+            onChange={(event) => setNewGroup(event.target.value)}
+          >
+            {TEMPLATE_GROUPS.map((group) => (
+              <option key={group.id} value={group.id}>{group.label}</option>
+            ))}
+          </select>
           <input
             id="new-template"
             type="text"
