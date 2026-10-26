@@ -1,15 +1,13 @@
+import { NotesWorkspace } from './NotesWorkspace.jsx'
 import { useMemo, useState } from 'react'
 import {
-  CheckSquare2,
-  Copy,
   Eraser,
   Mic,
-  Sparkles,
   Square,
   TextCursorInput,
   X,
 } from 'lucide-react'
-import { NOTE_LABELS, TEMPLATE_GROUPS } from '../constants/defaults.js'
+import { TEMPLATE_GROUPS } from '../constants/defaults.js'
 import { KnowledgeSearchRows } from './KnowledgeBaseSearch.jsx'
 
 export function DocuToolMini({
@@ -17,6 +15,7 @@ export function DocuToolMini({
   selectedIds,
   onToggle,
   notes,
+  noteNames, noteHtml, onAdd, onRename, saveError,
   activeNoteIndex,
   onActiveNoteIndexChange,
   onNoteChange,
@@ -73,7 +72,7 @@ export function DocuToolMini({
     if (!activeNote) return
     try {
       const message = await onCopy?.()
-      setSuccess(message || `${NOTE_LABELS[activeNoteIndex]} copied.`)
+      setSuccess(message || `${noteNames[activeNoteIndex]} copied.`)
     } catch (error) {
       setError(error.message || 'Could not copy the note.')
     }
@@ -142,71 +141,15 @@ export function DocuToolMini({
           <div className="docutool-mini__section-heading">
             <div>
               <h1 id="mini-notepad-heading">Notepad</h1>
-              <p>All five notes are synchronized with the browser app.</p>
+              <p>Named notes and formatting stay synchronized with the browser app.</p>
             </div>
           </div>
 
-          <div className="docutool-mini__tabs" role="tablist" aria-label="DocuTool Mini notes">
-            {NOTE_LABELS.map((label, index) => (
-              <button
-                key={label}
-                type="button"
-                role="tab"
-                aria-selected={activeNoteIndex === index}
-                className={activeNoteIndex === index ? 'is-active' : ''}
-                onClick={() => onActiveNoteIndexChange(index)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <textarea
-            className="docutool-mini__note"
-            value={activeNote}
-            onChange={(event) => onNoteChange(event.target.value)}
-            placeholder="Type documentation here or generate selected phrases…"
-            spellCheck="true"
-          />
-
-          <div className="docutool-mini__actions">
-            <button
-              type="button"
-              className="docutool-mini__generate"
-              disabled={selectedCount === 0}
-              onClick={handleGenerate}
-            >
-              <Sparkles size={14} />
-              Generate
-            </button>
-            <button
-              type="button"
-              className="docutool-mini__secondary"
-              disabled={!activeNote}
-              onClick={handleCopy}
-            >
-              <Copy size={14} />
-              Copy
-            </button>
-            <button
-              type="button"
-              className="docutool-mini__secondary"
-              disabled={!activeNote}
-              onClick={onClearNote}
-            >
-              <Eraser size={14} />
-              Clear
-            </button>
-            <button
-              type="button"
-              className="docutool-mini__secondary"
-              disabled={selectedCount === 0}
-              onClick={handleUncheck}
-            >
-              <CheckSquare2 size={14} />
-              Uncheck
-            </button>
-          </div>
+          <NotesWorkspace activeIndex={activeNoteIndex} note={activeNote} html={noteHtml[activeNoteIndex]}
+            names={noteNames} onAdd={onAdd} onRename={onRename} saveError={saveError}
+            onActiveIndexChange={onActiveNoteIndexChange} onNoteChange={onNoteChange}
+            onGenerate={handleGenerate} onCopy={handleCopy} onClear={onClearNote}
+            onUncheck={handleUncheck} selectedCount={selectedCount} />
 
           <p className={`docutool-mini__status docutool-mini__status--${statusType}`} aria-live="polite">
             {status || 'Generate updates this Mini and the full DocuTool at the same time.'}

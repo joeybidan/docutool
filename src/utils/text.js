@@ -1,3 +1,4 @@
+import { sanitizeHtml } from './richText.js'
 export function appendTextBlock(currentText, blockText) {
   const current = currentText ?? ''
   const block = (blockText ?? '').trim()
@@ -5,7 +6,7 @@ export function appendTextBlock(currentText, blockText) {
   if (!block) return current
   if (!current.trim()) return block
 
-  return `${current.replace(/\s+$/, '')}\n\n${block}`
+  return `${current}\n\n${block}`
 }
 
 export function formatTemplateBlock(templates) {
@@ -34,7 +35,7 @@ export function formatCallbackBlock(callbacks) {
     .join('\n')
 }
 
-export async function copyToClipboard(text, contextWindow = typeof window !== 'undefined' ? window : null) {
+export async function copyToClipboard(text, contextWindow = typeof window !== 'undefined' ? window : null, html = '') {
   if (!contextWindow) throw new Error('Clipboard access is unavailable in this browser.')
 
   const targetDocument = contextWindow.document
@@ -45,6 +46,15 @@ export async function copyToClipboard(text, contextWindow = typeof window !== 'u
       contextWindow.focus?.()
     }
 
+    if (html && contextWindow.ClipboardItem && contextWindow.navigator?.clipboard?.write) {
+      try {
+        await contextWindow.navigator.clipboard.write([new contextWindow.ClipboardItem({
+          'text/plain': new contextWindow.Blob([text], { type: 'text/plain' }),
+          'text/html': new contextWindow.Blob(['<div style="white-space:pre-wrap">' + sanitizeHtml(html, targetDocument) + '</div>'], { type: 'text/html' }),
+        })])
+        return
+      } catch { /* Retry plain text when HTML clipboard support is restricted. */ }
+    }
     if (contextWindow.navigator?.clipboard?.writeText) {
       await contextWindow.navigator.clipboard.writeText(text)
       return

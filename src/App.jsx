@@ -17,7 +17,6 @@ import { CSATScoresPanel, DailyRevealCard, QAScoresPanel } from './components/Sh
 import { TemplatePanel } from './components/TemplatePanel.jsx'
 import { Toast } from './components/Toast.jsx'
 import { TeamSpotlight } from './components/TeamSpotlight.jsx'
-import { NOTE_LABELS } from './constants/defaults.js'
 import { useCallbackList } from './hooks/useCallbackList.js'
 import { useDocuToolMini } from './hooks/useDocuToolMini.jsx'
 import { useLocalWorkspace } from './hooks/useLocalWorkspace.js'
@@ -36,6 +35,7 @@ function App() {
   const {
     templates,
     notes,
+    noteNames, noteHtml, addNote, renameNote, saveError,
     activeNoteIndex,
     setTemplates,
     updateNote,
@@ -79,30 +79,30 @@ function App() {
     if (!selectedTemplates.length) return ''
     const block = formatTemplateBlock(selectedTemplates)
     updateNote(activeNoteIndex, (currentText) => appendTextBlock(currentText, block))
-    const message = `${selectedTemplates.length} template${selectedTemplates.length === 1 ? '' : 's'} appended to ${NOTE_LABELS[activeNoteIndex]}.`
+    const message = `${selectedTemplates.length} template${selectedTemplates.length === 1 ? '' : 's'} appended to ${noteNames[activeNoteIndex]}.`
     notify(message)
     return message
-  }, [activeNoteIndex, notify, selectedTemplates, updateNote])
+  }, [noteNames, activeNoteIndex, notify, selectedTemplates, updateNote])
 
   const handleMiniCopy = useCallback(async (targetWindow) => {
     if (!activeNote) return ''
-    await copyToClipboard(activeNote, targetWindow)
-    const message = `${NOTE_LABELS[activeNoteIndex]} copied from DocuTool Mini.`
+    await copyToClipboard(activeNote, targetWindow, noteHtml[activeNoteIndex])
+    const message = `${noteNames[activeNoteIndex]} copied from DocuTool Mini.`
     notify(message)
     return message
-  }, [activeNote, activeNoteIndex, notify])
+  }, [activeNote, noteHtml, noteNames, activeNoteIndex, notify])
 
   const handleMiniClearNote = useCallback(() => {
     updateNote(activeNoteIndex, '')
-    notify(`${NOTE_LABELS[activeNoteIndex]} cleared.`)
-  }, [activeNoteIndex, notify, updateNote])
+    notify(`${noteNames[activeNoteIndex]} cleared.`)
+  }, [noteNames, activeNoteIndex, notify, updateNote])
 
   const handleAppendCaptured = useCallback(() => {
     const captured = audioCapture.capturedText.trim()
     if (!captured) return
     updateNote(activeNoteIndex, (currentText) => appendTextBlock(currentText, captured))
-    notify(`Captured conversation appended to ${NOTE_LABELS[activeNoteIndex]}.`)
-  }, [activeNoteIndex, audioCapture.capturedText, notify, updateNote])
+    notify(`Captured conversation appended to ${noteNames[activeNoteIndex]}.`)
+  }, [noteNames, activeNoteIndex, audioCapture.capturedText, notify, updateNote])
 
   const handleClearCaptured = useCallback(() => {
     if (
@@ -117,9 +117,10 @@ function App() {
     selectedIds,
     onToggle: handleTemplateToggle,
     notes,
+    noteNames, noteHtml, onAdd: addNote, onRename: renameNote, saveError,
     activeNoteIndex,
     onActiveNoteIndexChange: setActiveNoteIndex,
-    onNoteChange: (value) => updateNote(activeNoteIndex, value),
+    onNoteChange: (value, html) => updateNote(activeNoteIndex, value, html),
     onGenerate: handleMiniGenerate,
     onCopy: handleMiniCopy,
     onClearNote: handleMiniClearNote,
@@ -161,22 +162,22 @@ function App() {
       blocks.reduce((note, block) => appendTextBlock(note, block), currentText),
     )
     const total = selectedTemplates.length + selectedCallbacks.length
-    notify(`${total} selected item${total === 1 ? '' : 's'} appended to ${NOTE_LABELS[activeNoteIndex]}.`)
+    notify(`${total} selected item${total === 1 ? '' : 's'} appended to ${noteNames[activeNoteIndex]}.`)
   }
 
   const handleCopy = async () => {
     try {
-      await copyToClipboard(activeNote)
-      notify(`${NOTE_LABELS[activeNoteIndex]} copied to clipboard.`)
+      await copyToClipboard(activeNote, window, noteHtml[activeNoteIndex])
+      notify(`${noteNames[activeNoteIndex]} copied to clipboard.`)
     } catch (error) {
       notify(error.message, 'error')
     }
   }
 
   const handleClear = () => {
-    if (activeNote.length > 80 && !window.confirm(`Clear ${NOTE_LABELS[activeNoteIndex]}?`)) return
+    if (activeNote.length > 80 && !window.confirm(`Clear ${noteNames[activeNoteIndex]}?`)) return
     updateNote(activeNoteIndex, '')
-    notify(`${NOTE_LABELS[activeNoteIndex]} cleared.`)
+    notify(`${noteNames[activeNoteIndex]} cleared.`)
   }
 
   const handleUncheck = () => {
@@ -219,8 +220,9 @@ function App() {
             <NotesWorkspace
               activeIndex={activeNoteIndex}
               note={activeNote}
+              names={noteNames} html={noteHtml[activeNoteIndex]} onAdd={addNote} onRename={renameNote} saveError={saveError}
               onActiveIndexChange={setActiveNoteIndex}
-              onNoteChange={(value) => updateNote(activeNoteIndex, value)}
+              onNoteChange={(value, html) => updateNote(activeNoteIndex, value, html)}
               onGenerate={handleGenerate}
               onCopy={handleCopy}
               onClear={handleClear}
@@ -228,7 +230,7 @@ function App() {
               selectedCount={selectedTemplates.length + selectedCallbacks.length}
             />
             <AudioCapture
-              activeNoteLabel={NOTE_LABELS[activeNoteIndex]}
+              activeNoteLabel={noteNames[activeNoteIndex]}
               capturedText={audioCapture.capturedText}
               onCapturedTextChange={audioCapture.setCapturedText}
               isSupported={audioCapture.isSupported}

@@ -1,10 +1,13 @@
+import { useRef } from 'react'
+import { NoteTools } from './NoteTools.jsx'
 import { Copy, Eraser, ListX, Sparkles } from 'lucide-react'
-import { NoteEditor } from './NoteEditor.jsx'
+import { NoteEditor, FormatControls } from './NoteEditor.jsx'
 import { NoteTabs } from './NoteTabs.jsx'
 import { Button } from './ui/Button.jsx'
 
 export function NotesWorkspace({
   activeIndex,
+  names, html, onAdd, onRename, saveError,
   note,
   onActiveIndexChange,
   onNoteChange,
@@ -14,10 +17,12 @@ export function NotesWorkspace({
   onUncheck,
   selectedCount,
 }) {
+  const editorRef = useRef(null)
   return (
     <section className="panel notes-workspace" aria-label="Advanced notepad">
-      <NoteTabs activeIndex={activeIndex} onChange={onActiveIndexChange} />
-      <NoteEditor activeIndex={activeIndex} value={note} onChange={onNoteChange} />
+      <NoteTools note={note} html={html} name={names[activeIndex]} />
+      <NoteTabs activeIndex={activeIndex} onChange={onActiveIndexChange} names={names} onAdd={onAdd} onRename={onRename} />
+      <NoteEditor editorRef={editorRef} html={html} activeIndex={activeIndex} value={note} onChange={onNoteChange} />
       <div className="note-actions" aria-label="Notepad actions">
         <Button variant="primary" type="button" onClick={onGenerate} disabled={!selectedCount}>
           <Sparkles size={16} />
@@ -36,7 +41,8 @@ export function NotesWorkspace({
           <ListX size={16} />
           Uncheck
         </Button>
-        <span className="autosave-status" aria-live="polite">Saved locally</span>
+        <FormatControls editorRef={editorRef} onChange={onNoteChange} />
+        <span className="autosave-status" role="status">{saveError ? "Could not save locally. Export your notes before closing." : "Saved locally in this browser"}</span>
       </div>
     </section>
   )
