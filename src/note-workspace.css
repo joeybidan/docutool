@@ -15,3 +15,7 @@
 .docutool-mini .autosave-status { flex-basis:100%; font-size:11px; }
 
 .docutool-mini .rich-note-editor { height:230px; min-height:180px; }
+.notes-workspace { grid-template-rows:auto auto minmax(280px,1fr) auto; }
+.notes-workspace .note-actions { flex-wrap:wrap; }
+.notes-workspace .note-color { white-space:nowrap; }
+.notes-workspace .autosave-status { flex-basis:100%; text-align:right; }
