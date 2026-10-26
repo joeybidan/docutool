@@ -1,13 +1,17 @@
+import { textToHtml } from '../utils/richText.js'
 import { DEFAULT_TEMPLATES, TEMPLATE_GROUPS } from '../constants/defaults.js'
 
-export const LOCAL_STORAGE_KEY = 'docutool:workspace:v1'
-export const LOCAL_SCHEMA_VERSION = 2
+export const LOCAL_STORAGE_KEY = 'docutool:workspace:v3'
+const LEGACY_KEY = 'docutool:workspace:v1'
+export const LOCAL_SCHEMA_VERSION = 3
 
 const GROUP_IDS = new Set(TEMPLATE_GROUPS.map((group) => group.id))
 
 const createDefaultState = () => ({
   templates: DEFAULT_TEMPLATES.map((template) => ({ ...template })),
   notes: ['', '', '', '', ''],
+  noteNames: ['Note 1', 'Note 2', 'Note 3', 'Note 4', 'Note 5'],
+  noteHtml: ['', '', '', '', ''],
   activeNoteIndex: 0,
 })
 
@@ -38,19 +42,21 @@ const normalizeTemplates = (templates) => {
 
 const normalizeNotes = (data) =>
   Array.isArray(data?.notes)
-    ? Array.from({ length: 5 }, (_, index) =>
+    ? Array.from({ length: Math.max(1, data.notes.length) }, (_, index) =>
         typeof data.notes[index] === 'string' ? data.notes[index] : '',
       )
     : createDefaultState().notes
 
 const normalizeState = (data) => {
   const activeNoteIndex = Number.isInteger(data?.activeNoteIndex)
-    ? Math.min(4, Math.max(0, data.activeNoteIndex))
+    ? Math.min(normalizeNotes(data).length - 1, Math.max(0, data.activeNoteIndex))
     : 0
 
   return {
     templates: normalizeTemplates(data?.templates),
     notes: normalizeNotes(data),
+    noteNames: normalizeNotes(data).map((_, i) => typeof data?.noteNames?.[i] === 'string' && data.noteNames[i].trim() ? data.noteNames[i] : `Note ${i + 1}`),
+    noteHtml: normalizeNotes(data).map((text, i) => typeof data?.noteHtml?.[i] === 'string' ? data.noteHtml[i] : textToHtml(text)),
     activeNoteIndex,
   }
 }
@@ -77,16 +83,21 @@ export function loadLocalWorkspace() {
   if (typeof window === 'undefined') return createDefaultState()
 
   try {
-    const rawValue = window.localStorage.getItem(LOCAL_STORAGE_KEY)
+    const rawValue = window.localStorage.getItem(LOCAL_STORAGE_KEY) ?? window.localStorage.getItem(LEGACY_KEY)
     if (!rawValue) return createDefaultState()
 
-    const parsed = JSON.parse(rawValue)
-
-    if (parsed?.schemaVersion === 1) {
-      return migrateVersionOne(parsed.data)
+    let parsed
+    try { parsed = JSON.parse(rawValue) } catch (error) {
+      window.localStorage.setItem(`docutool:recovery:${Date.now()}`, rawValue)
+      throw error
     }
 
-    if (parsed?.schemaVersion !== LOCAL_SCHEMA_VERSION) {
+    if (parsed?.schemaVersion === 1) {
+      return normalizeState(migrateVersionOne(parsed.data))
+    }
+
+    if (![2, LOCAL_SCHEMA_VERSION].includes(parsed?.schemaVersion)) {
+      window.localStorage.setItem(`docutool:recovery:${Date.now()}`, rawValue)
       return createDefaultState()
     }
 

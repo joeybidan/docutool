@@ -1,0 +1,21 @@
+.note-tabs { display:flex; overflow-x:auto; flex-wrap:nowrap; max-width:100%; }
+.note-tab { flex:0 0 auto; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.note-manage-actions,.note-tools-row,.note-rename { display:flex; flex-wrap:wrap; gap:6px; padding:8px 0; }
+.note-tools { padding:8px 12px; }
+.note-tools p { font-size:12px; }
+.note-tools a,.note-tools button,.note-manage-actions button,.note-rename button,.note-color select { border:1px solid #b8c9db; background:#f6f9fc; color:#172033; padding:6px 9px; border-radius:7px; font-size:12px; cursor:pointer; }
+.note-color { display:inline-flex; align-items:center; gap:4px; font-size:12px; }
+.rich-note-editor { white-space:pre-wrap; overflow-wrap:anywhere; overflow-y:auto; min-height:280px; max-height:65vh; width:100%; }
+.rich-note-editor:focus { outline:2px solid #4b91d1; outline-offset:-2px; }
+.note-tab-controls { min-width:0; padding:0 12px; }
+.docutool-mini .notes-workspace { display:block; min-width:0; padding:0; }
+.docutool-mini .rich-note-editor { min-height:210px; font-size:13px; }
+.docutool-mini .note-actions { flex-wrap:wrap; gap:6px; padding:8px; }
+.docutool-mini .note-actions .button { font-size:12px; padding:6px 8px; }
+.docutool-mini .autosave-status { flex-basis:100%; font-size:11px; }
+
+.docutool-mini .rich-note-editor { height:230px; min-height:180px; }
+.notes-workspace { grid-template-rows:auto auto minmax(280px,1fr) auto; }
+.notes-workspace .note-actions { flex-wrap:wrap; }
+.notes-workspace .note-color { white-space:nowrap; }
+.notes-workspace .autosave-status { flex-basis:100%; text-align:right; }
