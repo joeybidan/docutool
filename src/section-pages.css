@@ -1,0 +1,340 @@
+.section-shell {
+  position: relative;
+  min-width: 0;
+}
+
+.section-shell > .panel,
+.section-shell > .recognition-section {
+  height: 100%;
+}
+
+.section-maximize {
+  position: absolute;
+  z-index: 12;
+  top: -8px;
+  right: 9px;
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid #b9c9df;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.96);
+  color: #275a9d;
+  box-shadow: 0 4px 12px rgb(15 23 42 / 0.12);
+  text-decoration: none;
+  transition: transform 140ms ease, border-color 140ms ease, background-color 140ms ease;
+}
+
+.section-maximize:hover {
+  border-color: #6f9bd5;
+  background: #edf4ff;
+  transform: translateY(-1px) scale(1.04);
+}
+
+.section-maximize--inline {
+  position: static;
+  width: 31px;
+  height: 31px;
+  flex: 0 0 31px;
+  box-shadow: none;
+}
+
+.info-panel__switch--with-maximize {
+  grid-template-columns: 1fr 1fr auto;
+}
+
+.section-page {
+  width: min(100%, 1800px);
+  min-height: calc(100vh - 72px);
+  margin: 0 auto;
+  padding: 16px 18px 34px;
+}
+
+.section-page__bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.section-page__bar > div {
+  min-width: 0;
+}
+
+.section-page__bar span {
+  display: block;
+  color: var(--text-faint);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.section-page__bar h1 {
+  margin: 1px 0 0;
+  color: #17345f;
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.15;
+}
+
+.section-page__back {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: #f8fbff;
+  color: #234f87;
+  font-size: 12px;
+  font-weight: 750;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.section-page__content {
+  min-width: 0;
+}
+
+.section-page__content > .panel,
+.section-page__content > .recognition-section {
+  width: 100%;
+  max-height: none;
+  margin: 0;
+}
+
+.section-page .template-panel,
+.section-page .info-panel,
+.section-page .healthcare-news-panel,
+.section-page .anonymous-suggestions,
+.section-page .monthly-scores-panel,
+.section-page .daily-reveal-card {
+  min-height: min(72vh, 760px);
+}
+
+.section-page .notes-workspace {
+  min-height: calc(100vh - 190px);
+}
+
+.section-page .audio-capture textarea {
+  min-height: 280px;
+}
+
+.section-page .knowledge-base-panel {
+  padding: 22px;
+}
+
+.section-page .knowledge-search-list {
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.section-page .knowledge-search-row input {
+  min-height: 52px;
+  font-size: 15px;
+}
+
+.section-page .shared-media-image img,
+.section-page .team-spotlight__portrait {
+  max-height: 70vh;
+}
+
+/* Note Templates: spread workflow groups across the page instead of one long column. */
+.section-page--notestemplates .template-panel {
+  padding: 20px;
+}
+
+.section-page--notestemplates .template-list--grouped {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-items: start;
+  gap: 14px;
+  overflow: visible;
+}
+
+.section-page--notestemplates .template-group {
+  height: 100%;
+}
+
+.section-page--notestemplates .panel-hint {
+  margin-top: 18px;
+}
+
+/* CareLinx News: readable thumbnail cards. */
+.section-page--carelinxnews .healthcare-news-list {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+  max-height: none;
+  overflow: visible;
+  border-top: 0;
+}
+
+.section-page--carelinxnews .healthcare-news-item {
+  min-height: 150px;
+  align-content: start;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.section-page--carelinxnews .healthcare-news-item__headline {
+  font-size: 14px;
+  line-height: 1.48;
+}
+
+/* Manager Announcements: stop ticker motion and show all cards at once. */
+.section-page--managerannouncements .info-panel {
+  display: block;
+  min-height: 0;
+  overflow: visible;
+  padding: 18px;
+}
+
+.section-page--managerannouncements .info-panel__body {
+  display: block;
+  padding: 0;
+}
+
+.section-page--managerannouncements .announcement-scroller {
+  overflow: visible;
+}
+
+.section-page--managerannouncements .announcement-list {
+  position: static;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+  padding: 14px 0 0;
+  animation: none !important;
+  transform: none !important;
+}
+
+.section-page--managerannouncements .announcement-item {
+  min-height: 160px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.section-page--managerannouncements .announcement-item h3 {
+  font-size: 14px;
+}
+
+.section-page--managerannouncements .announcement-item p {
+  font-size: 13px;
+}
+
+/* SOP & Trainings: full grid of readable links. */
+.section-page--soptrainings .info-panel {
+  display: block;
+  min-height: 0;
+  overflow: visible;
+  padding: 18px;
+}
+
+.section-page--soptrainings .info-panel__body {
+  display: block;
+  padding: 0;
+}
+
+.section-page--soptrainings .shared-link-list {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+  padding: 14px 0 0;
+  overflow: visible;
+}
+
+.section-page--soptrainings .shared-link {
+  min-height: 112px;
+  align-items: flex-start;
+  padding: 16px;
+}
+
+.section-page--soptrainings .shared-link strong {
+  font-size: 14px;
+}
+
+.section-page--soptrainings .shared-link small {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* Photo roulettes become static, evenly spread thumbnail grids on their subpages. */
+.section-page--teamrecognition .photo-roulette-viewport,
+.section-page--kudos .photo-roulette-viewport,
+.section-page--sharecarefamilymoments .photo-roulette-viewport {
+  overflow: visible;
+  padding: 8px 0 0;
+}
+
+.section-page--teamrecognition .photo-roulette-track,
+.section-page--kudos .photo-roulette-track,
+.section-page--sharecarefamilymoments .photo-roulette-track {
+  display: grid !important;
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  animation: none !important;
+  transform: none !important;
+}
+
+.section-page--teamrecognition .recognition-card[aria-hidden='true'],
+.section-page--kudos .recognition-card[aria-hidden='true'],
+.section-page--sharecarefamilymoments .recognition-card[aria-hidden='true'] {
+  display: none;
+}
+
+.section-page--teamrecognition .photo-roulette-track .recognition-card,
+.section-page--kudos .photo-roulette-track .recognition-card,
+.section-page--sharecarefamilymoments .photo-roulette-track .recognition-card {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  flex: none;
+}
+
+.section-page--teamrecognition .recognition-section,
+.section-page--kudos .recognition-section,
+.section-page--sharecarefamilymoments .recognition-section {
+  padding: 20px;
+}
+
+.section-page--carematch .cm-card {
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+@media (max-width: 780px) {
+  .section-page {
+    padding: 10px 9px 24px;
+  }
+
+  .section-page__bar {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .section-page__back {
+    min-height: 34px;
+    padding-inline: 9px;
+  }
+
+  .section-page--notestemplates .template-list--grouped,
+  .section-page--carelinxnews .healthcare-news-list,
+  .section-page--managerannouncements .announcement-list,
+  .section-page--soptrainings .shared-link-list,
+  .section-page--teamrecognition .photo-roulette-track,
+  .section-page--kudos .photo-roulette-track,
+  .section-page--sharecarefamilymoments .photo-roulette-track {
+    grid-template-columns: 1fr;
+  }
+}

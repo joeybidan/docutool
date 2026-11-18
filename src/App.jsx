@@ -13,6 +13,7 @@ import { KnowledgeBaseSearch } from './components/KnowledgeBaseSearch.jsx'
 import { NotesWorkspace } from './components/NotesWorkspace.jsx'
 import { PhotoGalleryStrip, RecognitionStrip } from './components/RecognitionStrip.jsx'
 import { SCTeamsChannels } from './components/SCTeamsChannels.jsx'
+import { SectionFrame, SectionPage, SECTION_META } from './components/SectionFrame.jsx'
 import { CSATScoresPanel, DailyRevealCard, QAScoresPanel } from './components/SharedMediaPanels.jsx'
 import { TemplatePanel } from './components/TemplatePanel.jsx'
 import { Toast } from './components/Toast.jsx'
@@ -30,6 +31,7 @@ import {
 } from './utils/text.js'
 import './feature-updates.css'
 import './time-tools.css'
+import './section-pages.css'
 
 function App() {
   const {
@@ -187,6 +189,174 @@ function App() {
 
   const media = sharedContent.dashboardMedia || {}
 
+  const renderSection = (slug) => {
+    switch (slug) {
+      case 'notestemplates':
+        return (
+          <TemplatePanel
+            templates={templates}
+            selectedIds={selectedIds}
+            onToggle={handleTemplateToggle}
+            onTemplatesChange={handleTemplatesChange}
+            onNotify={notify}
+          />
+        )
+      case 'callbacklist':
+        return (
+          <CallbackList
+            callbacks={callbacks}
+            selectedIds={selectedCallbackIds}
+            onToggle={handleCallbackToggle}
+            onSave={saveCallback}
+            onDelete={handleCallbackDelete}
+            onStatusChange={setCallbackStatus}
+            onNotify={notify}
+          />
+        )
+      case 'scteamschannels':
+        return <SCTeamsChannels />
+      case 'carelinxnews':
+        return <CarelinxNewsPanel />
+      case 'regularholidays':
+        return <HolidaysPanel />
+      case 'anonymoussuggestions':
+        return <AnonymousSuggestions onNotify={notify} />
+      case 'notepad':
+        return (
+          <NotesWorkspace
+            activeIndex={activeNoteIndex}
+            note={activeNote}
+            names={noteNames}
+            html={noteHtml[activeNoteIndex]}
+            onAdd={addNote}
+            onRename={renameNote}
+            saveError={saveError}
+            onActiveIndexChange={setActiveNoteIndex}
+            onNoteChange={(value, html) => updateNote(activeNoteIndex, value, html)}
+            onGenerate={handleGenerate}
+            onCopy={handleCopy}
+            onClear={handleClear}
+            onUncheck={handleUncheck}
+            selectedCount={selectedTemplates.length + selectedCallbacks.length}
+          />
+        )
+      case 'capturedconversation':
+        return (
+          <AudioCapture
+            activeNoteLabel={noteNames[activeNoteIndex]}
+            capturedText={audioCapture.capturedText}
+            onCapturedTextChange={audioCapture.setCapturedText}
+            isSupported={audioCapture.isSupported}
+            isListening={audioCapture.isListening}
+            error={audioCapture.error}
+            onStart={audioCapture.startListening}
+            onStop={audioCapture.stopListening}
+            onClear={handleClearCaptured}
+            onAppend={handleAppendCaptured}
+            onNotify={notify}
+          />
+        )
+      case 'knowledgebasesearch':
+        return <KnowledgeBaseSearch />
+      case 'qascoresrankmtd':
+        return <QAScoresPanel item={media.qa_scores_rank_mtd} />
+      case 'csatmtd':
+        return <CSATScoresPanel item={media.csat_mtd} />
+      case 'teamspotlight':
+        return <TeamSpotlight item={sharedContent.teamSpotlight} />
+      case 'managerannouncements':
+        return (
+          <InfoPanel
+            announcements={sharedContent.announcements}
+            links={sharedContent.links}
+            source={sharedContent.source}
+            loading={sharedContent.loading}
+            lockedMode="announcements"
+          />
+        )
+      case 'soptrainings':
+        return (
+          <InfoPanel
+            announcements={sharedContent.announcements}
+            links={sharedContent.links}
+            source={sharedContent.source}
+            loading={sharedContent.loading}
+            lockedMode="links"
+          />
+        )
+      case 'puzzleoftheday':
+        return <DailyRevealCard title="Puzzle of the Day" item={media.puzzle_of_day} />
+      case 'caregiveroftheday':
+        return <DailyRevealCard title="Caregiver of the Day" item={media.caregiver_of_day} />
+      case 'sopquizoftheday':
+        return <DailyRevealCard title="SOP Quiz of the Day" item={media.sop_quiz_of_day} />
+      case 'carematch':
+        return <CareMatchLauncher />
+      case 'teamrecognition':
+        return <RecognitionStrip recognition={sharedContent.recognition} />
+      case 'kudos':
+        return (
+          <PhotoGalleryStrip
+            title="Kudos"
+            subtitle="Shared praise and moments worth celebrating. Hover to pause and magnify; click for a closer look."
+            items={sharedContent.kudos || []}
+            sectionId="kudos"
+            direction="right-to-left"
+          />
+        )
+      case 'sharecarefamilymoments':
+        return (
+          <PhotoGalleryStrip
+            title="Sharecare Family Moments"
+            subtitle="Team memories and shared moments. Hover to pause and magnify; click for a closer look."
+            items={sharedContent.familyMoments || []}
+            sectionId="sharecare-family-moments"
+            direction="left-to-right"
+          />
+        )
+      default:
+        return null
+    }
+  }
+
+  const frameSection = (slug) => (
+    <SectionFrame slug={slug} label={SECTION_META[slug].label}>
+      {renderSection(slug)}
+    </SectionFrame>
+  )
+
+  const requestedSection = window.location.pathname
+    .replace(/^\/+|\/+$/g, '')
+    .toLowerCase()
+
+  const isFocusedSection = Boolean(requestedSection && SECTION_META[requestedSection])
+
+  if (isFocusedSection) {
+    return (
+      <div className="app-shell">
+        <Header onOpenAdmin={() => setIsAdminOpen(true)} onOpenMini={openMini} />
+
+        <SectionPage slug={requestedSection} label={SECTION_META[requestedSection].label}>
+          {renderSection(requestedSection)}
+        </SectionPage>
+
+        <AppFooter />
+
+        {isAdminOpen && (
+          <AdminModal
+            sharedContent={sharedContent}
+            onRefresh={sharedContent.refresh}
+            onNotify={notify}
+            onClose={() => setIsAdminOpen(false)}
+          />
+        )}
+
+        <Toast toast={toast} onDismiss={() => setToast(null)} />
+        {miniPortal}
+      </div>
+    )
+  }
+
   return (
     <div className="app-shell">
       <Header onOpenAdmin={() => setIsAdminOpen(true)} onOpenMini={openMini} />
@@ -194,58 +364,21 @@ function App() {
       <main id="workspace" className="app-main">
         <div className="workspace-grid">
           <div className="left-column">
-            <TemplatePanel
-              templates={templates}
-              selectedIds={selectedIds}
-              onToggle={handleTemplateToggle}
-              onTemplatesChange={handleTemplatesChange}
-              onNotify={notify}
-            />
-            <CallbackList
-              callbacks={callbacks}
-              selectedIds={selectedCallbackIds}
-              onToggle={handleCallbackToggle}
-              onSave={saveCallback}
-              onDelete={handleCallbackDelete}
-              onStatusChange={setCallbackStatus}
-              onNotify={notify}
-            />
-            <SCTeamsChannels />
-            <CarelinxNewsPanel />
-            <HolidaysPanel />
-            <AnonymousSuggestions onNotify={notify} />
+            {frameSection('notestemplates')}
+            {frameSection('callbacklist')}
+            {frameSection('scteamschannels')}
+            {frameSection('carelinxnews')}
+            {frameSection('regularholidays')}
+            {frameSection('anonymoussuggestions')}
           </div>
 
           <div className="center-column">
-            <NotesWorkspace
-              activeIndex={activeNoteIndex}
-              note={activeNote}
-              names={noteNames} html={noteHtml[activeNoteIndex]} onAdd={addNote} onRename={renameNote} saveError={saveError}
-              onActiveIndexChange={setActiveNoteIndex}
-              onNoteChange={(value, html) => updateNote(activeNoteIndex, value, html)}
-              onGenerate={handleGenerate}
-              onCopy={handleCopy}
-              onClear={handleClear}
-              onUncheck={handleUncheck}
-              selectedCount={selectedTemplates.length + selectedCallbacks.length}
-            />
-            <AudioCapture
-              activeNoteLabel={noteNames[activeNoteIndex]}
-              capturedText={audioCapture.capturedText}
-              onCapturedTextChange={audioCapture.setCapturedText}
-              isSupported={audioCapture.isSupported}
-              isListening={audioCapture.isListening}
-              error={audioCapture.error}
-              onStart={audioCapture.startListening}
-              onStop={audioCapture.stopListening}
-              onClear={handleClearCaptured}
-              onAppend={handleAppendCaptured}
-              onNotify={notify}
-            />
-            <KnowledgeBaseSearch />
-            <QAScoresPanel item={media.qa_scores_rank_mtd} />
-            <CSATScoresPanel item={media.csat_mtd} />
-            <TeamSpotlight item={sharedContent.teamSpotlight} />
+            {frameSection('notepad')}
+            {frameSection('capturedconversation')}
+            {frameSection('knowledgebasesearch')}
+            {frameSection('qascoresrankmtd')}
+            {frameSection('csatmtd')}
+            {frameSection('teamspotlight')}
           </div>
 
           <div className="right-column">
@@ -254,29 +387,18 @@ function App() {
               links={sharedContent.links}
               source={sharedContent.source}
               loading={sharedContent.loading}
+              showMaximize
             />
-            <DailyRevealCard title="Puzzle of the Day" item={media.puzzle_of_day} />
-            <DailyRevealCard title="Caregiver of the Day" item={media.caregiver_of_day} />
-            <DailyRevealCard title="SOP Quiz of the Day" item={media.sop_quiz_of_day} />
-            <CareMatchLauncher />
+            {frameSection('puzzleoftheday')}
+            {frameSection('caregiveroftheday')}
+            {frameSection('sopquizoftheday')}
+            {frameSection('carematch')}
           </div>
         </div>
 
-        <RecognitionStrip recognition={sharedContent.recognition} />
-        <PhotoGalleryStrip
-          title="Kudos"
-          subtitle="Shared praise and moments worth celebrating. Hover a photo to magnify; click for a closer look."
-          items={sharedContent.kudos || []}
-          sectionId="kudos"
-          direction="right-to-left"
-        />
-        <PhotoGalleryStrip
-          title="Sharecare Family Moments"
-          subtitle="Team memories and shared moments. Hover a photo to magnify; click for a closer look."
-          items={sharedContent.familyMoments || []}
-          sectionId="sharecare-family-moments"
-          direction="left-to-right"
-        />
+        {frameSection('teamrecognition')}
+        {frameSection('kudos')}
+        {frameSection('sharecarefamilymoments')}
       </main>
 
       <AppFooter />
