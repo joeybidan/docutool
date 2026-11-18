@@ -172,6 +172,7 @@ export const FALLBACK_RECOGNITION = [
 ]
 
 export const FALLBACK_DASHBOARD_MEDIA = {
+  carelinx_news: { slot: 'carelinx_news', imagePath: null, imageUrl: '', answer: '', revealAt: null, isPublished: true },
   qa_scores_rank_mtd: {
     slot: 'qa_scores_rank_mtd',
     imagePath: null,
