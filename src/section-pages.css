@@ -158,3 +158,36 @@
   .section-page--kudos .photo-roulette-track .recognition-card__portrait,
   .section-page--sharecarefamilymoments .photo-roulette-track .recognition-card__portrait { width: 90px; }
 }
+
+/* Small expand affordances for the header's timezone utilities. */
+.header-timezone-wrapper { position: relative; min-width: 0; flex: 0 1 auto; }
+.header-timezone-maximize {
+  position: absolute; z-index: 3; top: -9px; right: -9px;
+  display: grid; place-items: center; width: 24px; height: 24px;
+  border-radius: 7px; border: 1px solid #b8cbe5; background: #f2f7ff;
+  color: #275696; cursor: pointer;
+}
+.header-timezone-maximize:hover { background: #e0eeff; }
+.timezone-converter-drawer { position: relative; }
+.timezone-converter-maximize {
+  position: absolute; right: 33px; top: 2px; z-index: 2;
+  display: grid; place-items: center; width: 22px; height: 21px;
+  border: 0; border-radius: 5px; background: transparent;
+  color: #275696; cursor: pointer;
+}
+.timezone-converter-maximize:hover { background: #dceaff; }
+.section-page--timezones .timezone-tools { max-width: none; width: 100%; }
+.section-page--timezones .timezone-tools .timezone-clocks {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  overflow: visible; max-width: none;
+}
+.section-page--timezones .timezone-clock { padding: 20px; }
+.section-page--timezones .timezone-clock time { font-size: 19px; }
+.section-page--timezones .timezone-converter-drawer { max-width: 900px; }
+.section-page-content > .timezone-focus-panel { padding: 24px; }
+.section-page-not-found { max-width: 700px; margin: 10vh auto; padding: 30px; background: #fff; border-radius: 12px; }
+.app-main > .section-frame { margin-top: 11px; }
+@media (max-width: 780px) {
+  .header-timezone-wrapper { flex: 1 1 100%; }
+  .header-timezone-wrapper .timezone-tools { width: 100%; }
+}
