@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AdminModal } from './components/admin/AdminModal.jsx'
 import { AnonymousSuggestions } from './components/AnonymousSuggestions.jsx'
 import { AppFooter } from './components/AppFooter.jsx'
@@ -17,11 +17,15 @@ import { CSATScoresPanel, DailyRevealCard, QAScoresPanel } from './components/Sh
 import { TemplatePanel } from './components/TemplatePanel.jsx'
 import { Toast } from './components/Toast.jsx'
 import { TeamSpotlight } from './components/TeamSpotlight.jsx'
+import { SectionFrame, SectionPage } from './components/SectionFrame.jsx'
+import { TimezoneClocks } from './components/TimezoneClocks.jsx'
+import { TimezoneConverter } from './components/TimezoneConverter.jsx'
 import { useCallbackList } from './hooks/useCallbackList.js'
 import { useDocuToolMini } from './hooks/useDocuToolMini.jsx'
 import { useLocalWorkspace } from './hooks/useLocalWorkspace.js'
 import { useSharedContent } from './hooks/useSharedContent.js'
 import { useSynchronizedAudioCapture } from './hooks/useSynchronizedAudioCapture.js'
+import { getSectionSlug, SECTION_TITLES, sectionHref } from './utils/sectionRoutes.js'
 import {
   appendTextBlock,
   copyToClipboard,
@@ -30,6 +34,7 @@ import {
 } from './utils/text.js'
 import './feature-updates.css'
 import './time-tools.css'
+import './section-pages.css'
 
 function App() {
   const {
@@ -48,6 +53,33 @@ function App() {
   const [selectedCallbackIds, setSelectedCallbackIds] = useState(() => new Set())
   const [toast, setToast] = useState(null)
   const [isAdminOpen, setIsAdminOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState(() => getSectionSlug(window.location.pathname))
+
+  useEffect(() => {
+    const onPopState = () => setActiveSection(getSectionSlug(window.location.pathname))
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
+
+  useEffect(() => {
+    document.title = activeSection && SECTION_TITLES[activeSection]
+      ? `${SECTION_TITLES[activeSection]} | DocuTool`
+      : 'DocuTool'
+  }, [activeSection])
+
+  const openSection = useCallback((slug) => {
+    if (!Object.hasOwn(SECTION_TITLES, slug)) return
+    const path = sectionHref(slug)
+    if (window.location.pathname !== path) window.history.pushState({ docutoolSection: slug }, '', path)
+    setActiveSection(slug)
+    window.scrollTo(0, 0)
+  }, [])
+
+  const showDashboard = useCallback(() => {
+    if (window.location.pathname !== '/') window.history.pushState({}, '', '/')
+    setActiveSection('')
+    window.scrollTo(0, 0)
+  }, [])
 
   const activeNote = notes[activeNoteIndex]
   const selectedTemplates = useMemo(
@@ -186,100 +218,207 @@ function App() {
   }
 
   const media = sharedContent.dashboardMedia || {}
+  const isFocused = activeSection !== ''
+
+  // Use exactly the same components and data as the full dashboard.
+  // Moving to a direct URL never requires a new login or a second database.
+  const focusedSections = {
+    notestemplates: (
+      <TemplatePanel
+        templates={templates}
+        selectedIds={selectedIds}
+        onToggle={handleTemplateToggle}
+        onTemplatesChange={handleTemplatesChange}
+        onNotify={notify}
+      />
+    ),
+    callbacklist: (
+      <CallbackList
+        callbacks={callbacks}
+        selectedIds={selectedCallbackIds}
+        onToggle={handleCallbackToggle}
+        onSave={saveCallback}
+        onDelete={handleCallbackDelete}
+        onStatusChange={setCallbackStatus}
+        onNotify={notify}
+      />
+    ),
+    scteamschannels: <SCTeamsChannels />,
+    carelinxnews: <CarelinxNewsPanel />,
+    regularholidays: <HolidaysPanel />,
+    anonymoussuggestions: <AnonymousSuggestions onNotify={notify} />,
+    notepad: (
+      <NotesWorkspace
+        activeIndex={activeNoteIndex}
+        note={activeNote}
+        names={noteNames}
+        html={noteHtml[activeNoteIndex]}
+        onAdd={addNote}
+        onRename={renameNote}
+        saveError={saveError}
+        onActiveIndexChange={setActiveNoteIndex}
+        onNoteChange={(value, html) => updateNote(activeNoteIndex, value, html)}
+        onGenerate={handleGenerate}
+        onCopy={handleCopy}
+        onClear={handleClear}
+        onUncheck={handleUncheck}
+        selectedCount={selectedTemplates.length + selectedCallbacks.length}
+      />
+    ),
+    capturedconversation: (
+      <AudioCapture
+        activeNoteLabel={noteNames[activeNoteIndex]}
+        capturedText={audioCapture.capturedText}
+        onCapturedTextChange={audioCapture.setCapturedText}
+        isSupported={audioCapture.isSupported}
+        isListening={audioCapture.isListening}
+        error={audioCapture.error}
+        onStart={audioCapture.startListening}
+        onStop={audioCapture.stopListening}
+        onClear={handleClearCaptured}
+        onAppend={handleAppendCaptured}
+        onNotify={notify}
+      />
+    ),
+    knowledgebasesearch: <KnowledgeBaseSearch />,
+    qascoresrankmtd: <QAScoresPanel item={media.qa_scores_rank_mtd} />,
+    csatmtd: <CSATScoresPanel item={media.csat_mtd} />,
+    teamspotlight: <TeamSpotlight item={sharedContent.teamSpotlight} />,
+    managerannouncements: (
+      <InfoPanel
+        announcements={sharedContent.announcements}
+        links={sharedContent.links}
+        source={sharedContent.source}
+        loading={sharedContent.loading}
+        forcedMode="announcements"
+        onModeChange={(mode) => openSection(mode === 'links' ? 'soptrainings' : 'managerannouncements')}
+      />
+    ),
+    soptrainings: (
+      <InfoPanel
+        announcements={sharedContent.announcements}
+        links={sharedContent.links}
+        source={sharedContent.source}
+        loading={sharedContent.loading}
+        forcedMode="links"
+        onModeChange={(mode) => openSection(mode === 'links' ? 'soptrainings' : 'managerannouncements')}
+      />
+    ),
+    puzzleoftheday: <DailyRevealCard title="Puzzle of the Day" item={media.puzzle_of_day} />,
+    caregiveroftheday: <DailyRevealCard title="Caregiver of the Day" item={media.caregiver_of_day} />,
+    sopquizoftheday: <DailyRevealCard title="SOP Quiz of the Day" item={media.sop_quiz_of_day} />,
+    carematch: <CareMatchLauncher />,
+    teamrecognition: <RecognitionStrip recognition={sharedContent.recognition} expanded={isFocused} />,
+    kudos: (
+      <PhotoGalleryStrip
+        title="Kudos"
+        subtitle="Shared praise and moments worth celebrating. Hover a photo to magnify; click for a closer look."
+        items={sharedContent.kudos || []}
+        sectionId="kudos"
+        direction="right-to-left"
+        expanded={isFocused}
+      />
+    ),
+    sharecarefamilymoments: (
+      <PhotoGalleryStrip
+        title="Sharecare Family Moments"
+        subtitle="Team memories and shared moments. Hover a photo to magnify; click for a closer look."
+        items={sharedContent.familyMoments || []}
+        sectionId="sharecare-family-moments"
+        direction="left-to-right"
+        expanded={isFocused}
+      />
+    ),
+    timezones: (
+      <section className="panel timezone-focus-panel" aria-label="Timezones and alarms">
+        <TimezoneClocks onExpandConverter={() => openSection('timezoneconverter')} />
+      </section>
+    ),
+    timezoneconverter: (
+      <section className="panel timezone-focus-panel" aria-label="Timezone converter">
+        <TimezoneConverter />
+      </section>
+    ),
+  }
+
+  const dashboardSection = (slug) => (
+    <SectionFrame slug={slug} title={SECTION_TITLES[slug]} onOpen={openSection}>
+      {focusedSections[slug]}
+    </SectionFrame>
+  )
 
   return (
-    <div className="app-shell">
-      <Header onOpenAdmin={() => setIsAdminOpen(true)} onOpenMini={openMini} />
-
-      <main id="workspace" className="app-main">
-        <div className="workspace-grid">
-          <div className="left-column">
-            <TemplatePanel
-              templates={templates}
-              selectedIds={selectedIds}
-              onToggle={handleTemplateToggle}
-              onTemplatesChange={handleTemplatesChange}
-              onNotify={notify}
-            />
-            <CallbackList
-              callbacks={callbacks}
-              selectedIds={selectedCallbackIds}
-              onToggle={handleCallbackToggle}
-              onSave={saveCallback}
-              onDelete={handleCallbackDelete}
-              onStatusChange={setCallbackStatus}
-              onNotify={notify}
-            />
-            <SCTeamsChannels />
-            <CarelinxNewsPanel />
-            <HolidaysPanel />
-            <AnonymousSuggestions onNotify={notify} />
+    <div className={isFocused ? 'app-shell app-shell--focused' : 'app-shell'}>
+      {isFocused ? (
+        activeSection && focusedSections[activeSection] ? (
+          <SectionPage
+            slug={activeSection}
+            title={SECTION_TITLES[activeSection]}
+            onBack={showDashboard}
+          >
+            {focusedSections[activeSection]}
+          </SectionPage>
+        ) : (
+          <div className="section-page-not-found">
+            <h1>Section not found</h1>
+            <p>This DocuTool page does not exist.</p>
+            <a href="/" onClick={(event) => { event.preventDefault(); showDashboard() }}>
+              Return to DocuTool
+            </a>
           </div>
+        )
+      ) : (
+        <>
+          <Header
+            onOpenAdmin={() => setIsAdminOpen(true)}
+            onOpenMini={openMini}
+            onOpenTimezones={() => openSection('timezones')}
+            onOpenTimezoneConverter={() => openSection('timezoneconverter')}
+          />
 
-          <div className="center-column">
-            <NotesWorkspace
-              activeIndex={activeNoteIndex}
-              note={activeNote}
-              names={noteNames} html={noteHtml[activeNoteIndex]} onAdd={addNote} onRename={renameNote} saveError={saveError}
-              onActiveIndexChange={setActiveNoteIndex}
-              onNoteChange={(value, html) => updateNote(activeNoteIndex, value, html)}
-              onGenerate={handleGenerate}
-              onCopy={handleCopy}
-              onClear={handleClear}
-              onUncheck={handleUncheck}
-              selectedCount={selectedTemplates.length + selectedCallbacks.length}
-            />
-            <AudioCapture
-              activeNoteLabel={noteNames[activeNoteIndex]}
-              capturedText={audioCapture.capturedText}
-              onCapturedTextChange={audioCapture.setCapturedText}
-              isSupported={audioCapture.isSupported}
-              isListening={audioCapture.isListening}
-              error={audioCapture.error}
-              onStart={audioCapture.startListening}
-              onStop={audioCapture.stopListening}
-              onClear={handleClearCaptured}
-              onAppend={handleAppendCaptured}
-              onNotify={notify}
-            />
-            <KnowledgeBaseSearch />
-            <QAScoresPanel item={media.qa_scores_rank_mtd} />
-            <CSATScoresPanel item={media.csat_mtd} />
-            <TeamSpotlight item={sharedContent.teamSpotlight} />
-          </div>
+          <main id="workspace" className="app-main">
+            <div className="workspace-grid">
+              <div className="left-column">
+                {dashboardSection('notestemplates')}
+                {dashboardSection('callbacklist')}
+                {dashboardSection('scteamschannels')}
+                {dashboardSection('carelinxnews')}
+                {dashboardSection('regularholidays')}
+                {dashboardSection('anonymoussuggestions')}
+              </div>
 
-          <div className="right-column">
-            <InfoPanel
-              announcements={sharedContent.announcements}
-              links={sharedContent.links}
-              source={sharedContent.source}
-              loading={sharedContent.loading}
-            />
-            <DailyRevealCard title="Puzzle of the Day" item={media.puzzle_of_day} />
-            <DailyRevealCard title="Caregiver of the Day" item={media.caregiver_of_day} />
-            <DailyRevealCard title="SOP Quiz of the Day" item={media.sop_quiz_of_day} />
-            <CareMatchLauncher />
-          </div>
-        </div>
+              <div className="center-column">
+                {dashboardSection('notepad')}
+                {dashboardSection('capturedconversation')}
+                {dashboardSection('knowledgebasesearch')}
+                {dashboardSection('qascoresrankmtd')}
+                {dashboardSection('csatmtd')}
+                {dashboardSection('teamspotlight')}
+              </div>
 
-        <RecognitionStrip recognition={sharedContent.recognition} />
-        <PhotoGalleryStrip
-          title="Kudos"
-          subtitle="Shared praise and moments worth celebrating. Hover a photo to magnify; click for a closer look."
-          items={sharedContent.kudos || []}
-          sectionId="kudos"
-          direction="right-to-left"
-        />
-        <PhotoGalleryStrip
-          title="Sharecare Family Moments"
-          subtitle="Team memories and shared moments. Hover a photo to magnify; click for a closer look."
-          items={sharedContent.familyMoments || []}
-          sectionId="sharecare-family-moments"
-          direction="left-to-right"
-        />
-      </main>
+              <div className="right-column">
+                <InfoPanel
+                  announcements={sharedContent.announcements}
+                  links={sharedContent.links}
+                  source={sharedContent.source}
+                  loading={sharedContent.loading}
+                  onMaximize={(mode) => openSection(mode === 'links' ? 'soptrainings' : 'managerannouncements')}
+                />
+                {dashboardSection('puzzleoftheday')}
+                {dashboardSection('caregiveroftheday')}
+                {dashboardSection('sopquizoftheday')}
+                {dashboardSection('carematch')}
+              </div>
+            </div>
 
-      <AppFooter />
+            {dashboardSection('teamrecognition')}
+            {dashboardSection('kudos')}
+            {dashboardSection('sharecarefamilymoments')}
+          </main>
+
+          <AppFooter />
+        </>
+      )}
 
       {isAdminOpen && (
         <AdminModal
@@ -294,6 +433,7 @@ function App() {
       {miniPortal}
     </div>
   )
+
 }
 
 export default App
