@@ -216,7 +216,7 @@ function App() {
       case 'scteamschannels':
         return <SCTeamsChannels />
       case 'carelinxnews':
-        return <CarelinxNewsPanel />
+        return <CarelinxNewsPanel image={media.carelinx_news} />
       case 'regularholidays':
         return <HolidaysPanel />
       case 'anonymoussuggestions':
