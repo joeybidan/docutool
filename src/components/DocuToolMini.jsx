@@ -1,6 +1,8 @@
 import { NotesWorkspace } from './NotesWorkspace.jsx'
 import { useMemo, useState } from 'react'
 import {
+  ChevronDown,
+  ChevronRight,
   Eraser,
   Mic,
   Square,
@@ -37,6 +39,13 @@ export function DocuToolMini({
 }) {
   const [status, setStatus] = useState('')
   const [statusType, setStatusType] = useState('success')
+  const [expandedGroups, setExpandedGroups] = useState(() => new Set(['general-questions']))
+  const toggleGroup = (groupId) => setExpandedGroups((current) => {
+    const updated = new Set(current)
+    if (updated.has(groupId)) updated.delete(groupId)
+    else updated.add(groupId)
+    return updated
+  })
   const activeNote = notes[activeNoteIndex] || ''
   const selectedCount = templates.filter((template) => selectedIds.has(template.id)).length
   const groupedTemplates = useMemo(
@@ -116,24 +125,43 @@ export function DocuToolMini({
           </div>
 
           <div className="docutool-mini__templates">
-            {groupedTemplates.map((group) => (
-              <div className="docutool-mini__template-group" key={group.id}>
-                <h2>{group.label}</h2>
-                {group.templates.map((template) => (
-                  <label className="docutool-mini__option" key={template.id}>
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.has(template.id)}
-                      onChange={() => {
-                        onToggle(template.id)
-                        setStatus('')
-                      }}
-                    />
-                    <span>{template.text}</span>
-                  </label>
-                ))}
-              </div>
-            ))}
+            {groupedTemplates.map((group) => {
+              const expanded = expandedGroups.has(group.id)
+              const selectedInGroup = group.templates.filter((template) => selectedIds.has(template.id)).length
+              return (
+                <section className="docutool-mini__template-group" key={group.id} aria-label={group.label}>
+                  <h2 className="docutool-mini__template-heading">
+                    <button
+                      type="button"
+                      className="docutool-mini__template-toggle"
+                      aria-expanded={expanded}
+                      aria-controls={`mini-template-phrases-${group.id}`}
+                      onClick={() => toggleGroup(group.id)}
+                    >
+                      {expanded ? <ChevronDown size={13} aria-hidden="true" /> : <ChevronRight size={13} aria-hidden="true" />}
+                      <span>{group.label}</span>
+                      {selectedInGroup > 0 && <small className="docutool-mini__selected-count">{selectedInGroup} selected</small>}
+                      <small className="docutool-mini__group-count">{group.templates.length}</small>
+                    </button>
+                  </h2>
+                  <div id={`mini-template-phrases-${group.id}`} hidden={!expanded}>
+                    {group.templates.map((template) => (
+                      <label className="docutool-mini__option" key={template.id}>
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(template.id)}
+                          onChange={() => {
+                            onToggle(template.id)
+                            setStatus('')
+                          }}
+                        />
+                        <span>{template.text}</span>
+                      </label>
+                    ))}
+                  </div>
+                </section>
+              )
+            })}
           </div>
         </section>
 
