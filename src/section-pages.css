@@ -338,3 +338,92 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* CareLinx News: live current-month stories + administrator-managed feature image. */
+.carelinx-news-columns { display:grid; gap:14px; min-width:0; margin-top:11px; }
+.carelinx-news-feature { min-width:0; }
+.carelinx-news-feature__image {
+  display:grid; width:100%; padding:7px; margin:0; border:1px solid #d8e3f0;
+  border-radius:9px; background:#f5f8fc; color:#446281; cursor:zoom-in; gap:5px;
+}
+.carelinx-news-feature__image img {
+  width:100%; max-width:100%; max-height:185px; object-fit:contain;
+  display:block; border-radius:5px;
+}
+.carelinx-news-feature__image span {
+  display:inline-flex; justify-content:center; align-items:center; gap:5px;
+  font-size:10px; font-weight:700;
+}
+.carelinx-news-feature__placeholder {
+  display:grid; place-items:center; gap:6px; min-height:100px; padding:15px;
+  border:1px dashed #c0d3eb; border-radius:8px; color:#6c839e;
+  background:linear-gradient(135deg,#f3f8ff,#f9fbff); text-align:center;
+}
+.carelinx-news-feature__placeholder strong { color:#255b9b; font-size:12px; }
+.carelinx-news-feature__placeholder span { font-size:10px; }
+.carelinx-news-stories { min-width:0; }
+.carelinx-news-toolbar { display:flex; align-items:stretch; gap:8px; }
+.carelinx-news-toolbar .carelinx-google-news-link { min-width:0; flex:1; margin:0; }
+.carelinx-news-refresh {
+  display:inline-flex; align-items:center; justify-content:center; gap:5px;
+  border:1px solid #c7d9ee; border-radius:7px; padding:0 9px;
+  background:#f9fbff; color:#21558b; font-size:10px; font-weight:750; cursor:pointer;
+}
+.carelinx-news-refresh:hover:not(:disabled) { background:#eaf3ff; }
+.carelinx-news-refresh:disabled { opacity:.6; cursor:wait; }
+.carelinx-news-status {
+  margin:12px 0; padding:12px; background:#f4f8ff; border-radius:7px;
+  color:#426183; font-size:12px; line-height:1.5;
+}
+.carelinx-news-status--error { background:#fff6ee; color:#9a511f; }
+.carelinx-news-story-preview {
+  display:grid; place-items:center; min-width:0; height:38px;
+  background:#ebf4ff; color:#2c639b; border-radius:6px; overflow:hidden;
+}
+.carelinx-news-story-preview img { display:block; width:100%; height:100%; object-fit:cover; }
+.carelinx-news-story-summary { display:none; color:#62758b; font-size:11px; line-height:1.5; }
+.carelinx-news-panel .healthcare-news-item { overflow:hidden; min-width:0; }
+.carelinx-news-panel .healthcare-news-footer { overflow-wrap:anywhere; }
+
+/* Expanded CareLinx News: exactly two major columns, image on left, articles on right. */
+.section-page--carelinxnews .carelinx-news-columns {
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  align-items:start; gap:24px; margin-top:18px;
+}
+.section-page--carelinxnews .carelinx-news-feature {
+  position:sticky; top:14px; min-width:0;
+}
+.section-page--carelinxnews .carelinx-news-feature__image { padding:12px; }
+.section-page--carelinxnews .carelinx-news-feature__image img {
+  width:100%; max-height:min(72vh,820px); object-fit:contain;
+}
+.section-page--carelinxnews .carelinx-news-feature__placeholder {
+  min-height:min(62vh,600px);
+}
+.section-page--carelinxnews .healthcare-news-list {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:stretch; gap:12px; max-height:none; overflow:visible;
+  border:0; margin-top:12px;
+}
+.section-page--carelinxnews .healthcare-news-item {
+  display:grid; align-content:start; min-width:0; min-height:220px;
+  padding:13px; border:1px solid #d8e3f0; border-radius:10px;
+  background:#fff; gap:9px;
+}
+.section-page--carelinxnews .carelinx-news-story-preview { height:105px; }
+.section-page--carelinxnews .healthcare-news-item__headline { font-size:13px; line-height:1.45; }
+.section-page--carelinxnews .carelinx-news-story-summary { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; margin:0; }
+.section-page--carelinxnews .healthcare-news-footer { margin-top:18px; font-size:11px; }
+
+@media(max-width:1100px) {
+  .section-page--carelinxnews .healthcare-news-list { grid-template-columns:1fr; }
+}
+@media(max-width:790px) {
+  .section-page--carelinxnews .carelinx-news-columns { grid-template-columns:1fr; }
+  .section-page--carelinxnews .carelinx-news-feature { position:static; }
+  .section-page--carelinxnews .carelinx-news-feature__image img { max-height:50vh; }
+  .section-page--carelinxnews .carelinx-news-feature__placeholder { min-height:180px; }
+  .section-page--carelinxnews .healthcare-news-list { grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); }
+}
+@media(prefers-reduced-motion:reduce) { .carelinx-news-feature__image { transition:none; } }
