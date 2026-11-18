@@ -1,0 +1,160 @@
+/* Focused direct-linkable DocuTool sections. Overrides apply only on a section page. */
+.section-frame { position: relative; min-width: 0; }
+.section-frame > .panel, .section-frame > .recognition-section { min-width: 0; width: 100%; margin-top: 0; }
+.section-frame > .panel > .panel-heading,
+.section-frame > .panel > .audio-capture__heading,
+.section-frame > .recognition-section > .recognition-heading { padding-right: 39px; }
+.section-frame__maximize,
+.info-panel__maximize {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 29px; height: 29px; border: 1px solid #b8cbe5; border-radius: 7px;
+  background: #f2f7ff; color: #275696; cursor: pointer;
+}
+.section-frame__maximize {
+  position: absolute; z-index: 4; top: 9px; right: 10px;
+  box-shadow: 0 1px 4px rgba(23,48,93,.09);
+}
+.section-frame__maximize:hover,
+.info-panel__maximize:hover,
+.section-frame__maximize:focus-visible,
+.info-panel__maximize:focus-visible { background: #dfedff; border-color: #5d92d6; outline-offset: 2px; }
+.section-frame--notepad .section-frame__maximize { top: -10px; right: -8px; }
+.section-frame--carematch .section-frame__maximize { top: 8px; right: 8px; }
+.info-panel__maximize { margin-left: auto; flex: 0 0 auto; }
+.info-panel__title-row h2 { flex: 0 1 auto; }
+
+/* The full dashboard retains its animated news and photo roulettes. */
+.section-page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; background: #fff; border-bottom: 1px solid #d5e1f0;
+  padding: 16px max(20px, calc((100vw - 1680px)/2));
+}
+.section-page-header__back { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; color: #1a58ae; text-decoration: none; font-weight: 700; }
+.section-page-header__heading { text-align: center; min-width: 0; }
+.section-page-header__heading span { font-size: 11px; color: #607792; font-weight: 650; }
+.section-page-header__heading h1 { margin: 2px 0 0; font-size: clamp(22px, 2.2vw, 33px); color: #17355e; }
+.section-page-header__permalink { color: #52739b; text-decoration: none; font-size: 12px; white-space: nowrap; }
+.section-page-header a:hover { text-decoration: underline; }
+.section-page-content {
+  width: min(100% - 32px, 1560px); min-height: calc(100vh - 110px);
+  margin: 20px auto 40px; min-width: 0;
+}
+.section-page-content > .panel, .section-page-content > .recognition-section {
+  width: 100%; max-width: none; min-width: 0; margin: 0;
+  box-sizing: border-box;
+}
+.section-page-content > .panel { padding: clamp(16px, 2.2vw, 28px); }
+.section-page-content > .recognition-section { padding: clamp(16px, 2.2vw, 28px); }
+
+/* Grid of workflow groups, not a single vertically scrolling list. */
+.section-page--notestemplates .template-list--grouped {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  align-items: start; gap: 15px; overflow: visible; max-height: none;
+}
+.section-page--notestemplates .template-group {
+  min-width: 0; border: 1px solid #d7e4f2; border-radius: 9px;
+  background: #f9fbff; padding-bottom: 8px;
+}
+.section-page--notestemplates .template-group__options { padding-inline: 10px; }
+.section-page--notestemplates .template-panel { display: flex; min-height: 65vh; }
+.section-page--notestemplates .template-option { font-size: 14px; line-height: 1.5; }
+
+/* News items gain full-height cards with readable content. */
+.section-page--carelinxnews .healthcare-news-list {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 285px), 1fr));
+  gap: 14px; align-items: stretch; max-height: none; overflow: visible;
+  border: none; margin-top: 20px;
+}
+.section-page--carelinxnews .healthcare-news-item {
+  display: grid; align-content: start; padding: 17px; border: 1px solid #d7e4f2;
+  border-radius: 10px; background: #f9fbff; text-decoration: none;
+}
+.section-page--carelinxnews .healthcare-news-item__headline { font-size: 16px; line-height: 1.5; }
+
+/* Both tabbed info views are expanded into independent URLs. */
+.section-page--managerannouncements .info-panel,
+.section-page--soptrainings .info-panel {
+  display: block; max-height: none; min-height: 65vh; height: auto; overflow: visible; padding: 14px 18px 24px;
+}
+.section-page--managerannouncements .info-panel__body,
+.section-page--soptrainings .info-panel__body { display: block; padding-top: 22px; }
+.section-page--managerannouncements .announcement-scroller { display: block; height: auto; max-height: none; overflow: visible; }
+.section-page--managerannouncements .announcement-list {
+  position: static; inset: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 16px; animation: none !important; transform: none !important; will-change: auto;
+}
+.section-page--managerannouncements .announcement-item {
+  min-width: 0; border: 1px solid #d7e4f2; background: #f9fbff; border-radius: 10px; padding: 18px;
+}
+.section-page--managerannouncements .announcement-item h3 { font-size: 16px; line-height: 1.4; }
+.section-page--managerannouncements .announcement-item p { font-size: 14px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.section-page--managerannouncements .announcement-item time { font-size: 12px; }
+.section-page--soptrainings .shared-link-list {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  align-items: stretch; gap: 14px; overflow: visible; max-height: none;
+}
+.section-page--soptrainings .shared-link {
+  padding: 20px; border: 1px solid #d7e4f2; border-radius: 10px;
+  background: #f9fbff; min-height: 100px; box-sizing: border-box;
+}
+.section-page--soptrainings .shared-link strong { font-size: 16px; }
+.section-page--soptrainings .shared-link small { font-size: 13px; line-height: 1.6; }
+
+/* A gallery page shows every unique photo exactly once, in a responsive grid. */
+.section-page--teamrecognition .photo-roulette-viewport,
+.section-page--kudos .photo-roulette-viewport,
+.section-page--sharecarefamilymoments .photo-roulette-viewport {
+  overflow: visible; padding: 12px 0 8px;
+}
+.section-page--teamrecognition .photo-roulette-track,
+.section-page--kudos .photo-roulette-track,
+.section-page--sharecarefamilymoments .photo-roulette-track {
+  display: grid !important; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  width: 100%; max-width: none; gap: 18px; animation: none !important;
+  transform: none !important; overflow: visible !important;
+}
+.section-page--teamrecognition .photo-roulette-track .recognition-card,
+.section-page--kudos .photo-roulette-track .recognition-card,
+.section-page--sharecarefamilymoments .photo-roulette-track .recognition-card {
+  display: grid; width: 100%; min-width: 0; max-width: none;
+  grid-template-columns: 120px minmax(0, 1fr); gap: 16px;
+  box-sizing: border-box; padding: 16px;
+}
+.section-page--teamrecognition .photo-roulette-track .recognition-card__portrait,
+.section-page--kudos .photo-roulette-track .recognition-card__portrait,
+.section-page--sharecarefamilymoments .photo-roulette-track .recognition-card__portrait { width: 120px; }
+.section-page--teamrecognition .recognition-card h3,
+.section-page--kudos .recognition-card h3,
+.section-page--sharecarefamilymoments .recognition-card h3 { font-size: 16px; }
+.section-page--teamrecognition .recognition-card p,
+.section-page--kudos .recognition-card p,
+.section-page--sharecarefamilymoments .recognition-card p { font-size: 13px; line-height: 1.5; }
+
+/* Other focused sections receive substantially more reading and editing space. */
+.section-page--notepad .notes-workspace { min-height: min(80vh, 1000px); }
+.section-page--notepad .rich-note-editor { min-height: 50vh; }
+.section-page--capturedconversation .audio-capture textarea { min-height: 45vh; }
+.section-page--knowledgebasesearch .knowledge-search-list { max-width: 1100px; gap: 16px; }
+.section-page--knowledgebasesearch .knowledge-search-row { min-height: 52px; }
+.section-page--callbacklist .callback-list,
+.section-page--scteamschannels .teams-channel-list,
+.section-page--anonymoussuggestions .anonymous-suggestions__feed {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px;
+}
+.section-page--regularholidays .holiday-columns { gap: 28px; }
+.section-page--timezones .timezone-clocks { display: flex; flex-wrap: wrap; overflow: visible; }
+.section-page--timezoneconverter .timezone-converter { max-width: 980px; margin-inline: auto; }
+.section-page--carematch { max-width: 1250px; }
+
+@media (max-width: 650px) {
+  .section-page-header { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 12px 16px; }
+  .section-page-header__heading { order: 3; width: 100%; text-align: left; }
+  .section-page-header__permalink { margin-left: auto; }
+  .section-page-content { width: min(100% - 20px, 1560px); margin-top: 12px; }
+  .section-page--teamrecognition .photo-roulette-track .recognition-card,
+  .section-page--kudos .photo-roulette-track .recognition-card,
+  .section-page--sharecarefamilymoments .photo-roulette-track .recognition-card { grid-template-columns: 90px minmax(0,1fr); }
+  .section-page--teamrecognition .photo-roulette-track .recognition-card__portrait,
+  .section-page--kudos .photo-roulette-track .recognition-card__portrait,
+  .section-page--sharecarefamilymoments .photo-roulette-track .recognition-card__portrait { width: 90px; }
+}
