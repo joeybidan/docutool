@@ -84,8 +84,8 @@ function GalleryImage({ item, onOpen, isClone = false }) {
   )
 }
 
-function RouletteTrack({ items, direction, renderCard }) {
-  const shouldAnimate = items.length > 1
+function RouletteTrack({ items, direction, renderCard, expanded = false }) {
+  const shouldAnimate = !expanded && items.length > 1
   const repeatedItems = shouldAnimate
     ? [
         ...items.map((item) => ({ item, isClone: false, key: `primary-${item.id}` })),
@@ -98,6 +98,7 @@ function RouletteTrack({ items, direction, renderCard }) {
       className="photo-roulette-viewport"
       data-direction={direction}
       data-animated={shouldAnimate ? 'true' : 'false'}
+      data-expanded={expanded ? 'true' : 'false'}
     >
       <div className="recognition-gallery photo-roulette-track" data-layout="scroll">
         {repeatedItems.map(({ item, isClone, key }) => renderCard(item, isClone, key))}
@@ -106,7 +107,7 @@ function RouletteTrack({ items, direction, renderCard }) {
   )
 }
 
-export function RecognitionStrip({ recognition }) {
+export function RecognitionStrip({ recognition, expanded = false }) {
   const count = recognition.length
   const [viewerItem, setViewerItem] = useState(null)
 
@@ -124,6 +125,7 @@ export function RecognitionStrip({ recognition }) {
         <RouletteTrack
           items={recognition}
           direction="left-to-right"
+          expanded={expanded}
           renderCard={(item, isClone, key) => (
             <article className="recognition-card" key={key} aria-hidden={isClone || undefined}>
               <div className="recognition-card__portrait">
@@ -156,7 +158,7 @@ export function RecognitionStrip({ recognition }) {
   )
 }
 
-export function PhotoGalleryStrip({ title, subtitle, items, sectionId, direction = 'right-to-left' }) {
+export function PhotoGalleryStrip({ title, subtitle, items, sectionId, direction = 'right-to-left', expanded = false }) {
   const count = items.length
   const [viewerItem, setViewerItem] = useState(null)
   const headingId = `${sectionId}-heading`
@@ -175,6 +177,7 @@ export function PhotoGalleryStrip({ title, subtitle, items, sectionId, direction
         <RouletteTrack
           items={items}
           direction={direction}
+          expanded={expanded}
           renderCard={(item, isClone, key) => {
             const index = items.findIndex((candidate) => candidate.id === item.id)
             const displayTitle = item.title || `${title} photo ${index + 1}`
