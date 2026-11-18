@@ -34,7 +34,6 @@ import {
 } from './utils/text.js'
 import './feature-updates.css'
 import './time-tools.css'
-import './section-pages.css'
 
 function App() {
   const {
