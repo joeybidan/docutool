@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Bell, ChevronDown, Clock3 } from 'lucide-react'
+import { Bell, ChevronDown, Clock3, Maximize2 } from 'lucide-react'
 import { formatDateInZone, formatFullDateTimeInZone, formatTimeInZone, TIMEZONES } from '../utils/timezones.js'
 import { CLOCK_ALARMS_KEY, parseClockAlarms, triggerDueAlarms } from '../utils/clockAlarms.js'
 import { useAlarmSound } from '../hooks/useAlarmSound.js'
 import { ClockAlarmDialog } from './ClockAlarmDialog.jsx'
 import { TimezoneConverter } from './TimezoneConverter.jsx'
 
-export function TimezoneClocks() {
+export function TimezoneClocks({ onExpandConverter }) {
   const [now, setNow] = useState(() => new Date())
   const [alarms, setAlarms] = useState(() => {
     try { return parseClockAlarms(window.localStorage.getItem(CLOCK_ALARMS_KEY)) } catch { return {} }
@@ -69,6 +69,11 @@ export function TimezoneClocks() {
       })}
       </div>
       <div className={`timezone-converter-drawer${converterOpen ? ' timezone-converter-drawer--open' : ''}`}>
+        {onExpandConverter && (
+          <button type="button" className="timezone-converter-maximize" title="Maximize timezone converter" aria-label="Maximize timezone converter" onClick={onExpandConverter}>
+            <Maximize2 size={13} aria-hidden="true" />
+          </button>
+        )}
         <button
           type="button"
           className="timezone-converter-toggle"
