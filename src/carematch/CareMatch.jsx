@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { newGame, applyAction, assignmentPoints, replay } from './engine.mjs'
+import { MemberAvatar } from './MemberAvatar.jsx'
 import './carematch.css'
 
 const SAVE_KEY = 'docutool:carematch:v1'
@@ -28,26 +29,32 @@ async function api(body) {
 
 function Ranking({ rows }) {
   return <ol className="cm-ranking" aria-label="All-time Top 5">
-    {Array.from({ length: 5 }, (_, i) => <li key={i} className={rows?.[i]?.isYou ? 'cm-you' : ''}>
+    {Array.from({ length: 5 }, (_, i) => <li key={i} className={rows?.[i]?.isYou ? 'cm-you cm-you--celebrate' : ''}>
       <span className="cm-rank">{String(i + 1).padStart(2, '0')}</span>
       <span className="cm-player">{rows?.[i]?.name || '—'}{rows?.[i]?.isYou && <small> YOU</small>}</span>
       <strong>{rows?.[i] ? format(rows[i].score) : '—'}</strong>
+      {rows?.[i]?.isYou && <span className="cm-rank-confetti" aria-hidden="true">{Array.from({ length: 8 }, (_, n) => <i key={n} style={{ '--piece': n }} />)}</span>}
     </li>)}
   </ol>
 }
 
 export default function CareMatch() {
-  const gameRef = useRef(null), touch = useRef(null), skipClick = useRef(false)
+  const gameRef = useRef(null), touch = useRef(null), skipClick = useRef(false), celebrationTimer = useRef(null)
   const [round, setRound] = useState(restore)
   const [name, setName] = useState(() => read(NAME_KEY) || '')
   const [selectedMember, setSelectedMember] = useState(null)
   const [selectedTile, setSelectedTile] = useState(null)
+  const [celebrating, setCelebrating] = useState(null)
+  const [avatarTap, setAvatarTap] = useState(0)
   const [busy, setBusy] = useState(false), [error, setError] = useState(''), [notice, setNotice] = useState('')
   const [boards, setBoards] = useState(null), [boardError, setBoardError] = useState('')
   const state = round?.state || newGame(1024)
   const request = selectedMember !== null ? state.requests[selectedMember] : null
   const reward = selectedTile !== null && selectedMember !== null ? assignmentPoints(state, selectedMember, selectedTile) : null
-  const active = Boolean(round && !busy && !state.ended && !round.submitted)
+  const active = Boolean(round && !busy && !celebrating && !state.ended && !round.submitted)
+  const movesLeft = Math.max(0, 60 - state.moves)
+
+  useEffect(() => () => window.clearTimeout(celebrationTimer.current), [])
 
   async function refresh() {
     try { setBoards(await api()); setBoardError('') }
@@ -89,6 +96,23 @@ export default function CareMatch() {
     finally { setBusy(false) }
   }
 
+  function assignWithHeart() {
+    if (!active || !request || reward === null) return
+    const action = { type: 'assign', member: selectedMember, tile: selectedTile }
+    setCelebrating({ id: request.id, index: selectedMember })
+    // Let the pixel heart play before the replacement member enters.
+    window.clearTimeout(celebrationTimer.current)
+    celebrationTimer.current = window.setTimeout(() => {
+      setRound(current => {
+        if (!current || current.state.ended || current.submitted) return current
+        const next = applyAction(current.state, action)
+        if (next === current.state) return current
+        return { ...current, state: next, actions: [...current.actions, action] }
+      })
+      setSelectedMember(null); setSelectedTile(null); setNotice(''); setError(''); setCelebrating(null)
+    }, 640)
+  }
+
   function keyDown(event) {
     if (event.target.closest('input, textarea, select') || !active) return
     const direction = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' }[event.key]
@@ -99,15 +123,20 @@ export default function CareMatch() {
     <header className="cm-header"><h2><span aria-hidden="true">♥</span> CARE<span>MATCH</span></h2>
       <div className="cm-score"><small>{round?.mode === 'practice' ? 'PRACTICE' : 'SCORE'}</small><strong>{format(state.score)}</strong></div></header>
     <div className="cm-body">
-      <div className="cm-stats"><span><b>{60 - state.moves}</b> moves</span><span><b>{state.supported}</b> helped</span><span><b>{state.missed}/3</b> missed</span></div>
+      <div className="cm-stats" aria-label="Current shift statistics">
+        <span key={`moves-${movesLeft}`} className={`cm-stat cm-stat--moves ${movesLeft <= 10 ? 'cm-stat--warning' : ''} ${movesLeft <= 5 ? 'cm-stat--critical' : ''}`}><span aria-hidden="true">{movesLeft <= 5 ? '🔥' : movesLeft <= 10 ? '⏳' : '🎮'}</span> <b>{movesLeft}</b> moves {movesLeft <= 5 && <em>LOW!</em>}</span>
+        <span key={`helped-${state.supported}`} className="cm-stat cm-stat--helped"><span aria-hidden="true">{state.supported ? '💚' : '🤝'}</span> <b>{state.supported}</b> helped</span>
+        <span key={`missed-${state.missed}`} className={`cm-stat cm-stat--missed ${state.missed >= 2 ? 'cm-stat--critical' : ''}`}><span aria-hidden="true">{state.missed >= 2 ? '🚨' : state.missed ? '⚠️' : '🛡️'}</span> <b>{state.missed}/3</b> missed</span>
+      </div>
+      <div className="cm-play-area">
       {!round && <div className="cm-start"><p>Merge caregiver hours. Match members. Reach the Top 5.</p>
         <label htmlFor="cm-name">Arcade alias</label><div className="cm-start-row"><input id="cm-name" value={name} maxLength={12} autoComplete="off" spellCheck="false" placeholder="YOUR NAME" onChange={e => setName(e.target.value.toUpperCase().replace(/[^\p{L}\p{N} _.-]/gu, ''))} />
           <button className="cm-primary" disabled={busy} onClick={() => start()}>{busy ? 'WAIT…' : 'PLAY'}</button></div>
         <button className="cm-link" disabled={busy} onClick={() => start(true)}>Practice offline</button></div>}
       <h3 className="cm-caption">MEMBERS WAITING <span>SELECT A MEMBER, THEN HOURS</span></h3>
-      <div className="cm-members">{state.requests.map((member, index) => <button key={index} disabled={!member || !active} onClick={() => { setSelectedMember(index); setSelectedTile(null) }}
+      <div className="cm-members">{state.requests.map((member, index) => <button key={member?.id ?? `empty-${index}`} disabled={!member || !active} onClick={() => { setSelectedMember(index); setSelectedTile(null); setAvatarTap(t => t + 1) }}
         aria-pressed={selectedMember === index} className={`cm-member ${selectedMember === index ? 'is-selected' : ''} ${member?.left <= 3 ? 'is-urgent' : ''}`}>
-        {member ? <><strong>{member.name}</strong><b>{member.hours}h</b><small>{member.left} moves</small></> : <><strong>✓</strong><small>All set</small></>}
+        {member ? <><MemberAvatar key={`${member.id}-${selectedMember === index ? avatarTap : 'idle'}`} id={member.id} name={member.name} tapped={selectedMember === index} celebrating={celebrating?.id === member.id && celebrating?.index === index} /><span className="cm-member__details"><strong>{member.name}</strong><b>{member.hours}h</b><small>{member.left} moves {member.left <= 3 && <span aria-hidden="true">⚠️</span>}</small></span></> : <><strong>✓</strong><small>All set</small></>}
       </button>)}</div>
       <div className="cm-board" role="group" aria-label="Caregiver hours board, four rows and four columns"
         onPointerDown={e => { skipClick.current = false; touch.current = { x: e.clientX, y: e.clientY } }}
@@ -126,7 +155,7 @@ export default function CareMatch() {
           aria-label={`Row ${Math.floor(i / 4) + 1}, column ${i % 4 + 1}: ${hours ? hours + ' hours' : 'empty'}${request && hours >= request.hours ? hours === request.hours ? ', perfect fit' : ', oversized coverage' : ''}`}>
           {hours || ''}</button>)}
       </div>
-      {reward && active ? <button className="cm-primary cm-assign" onClick={() => act({ type: 'assign', member: selectedMember, tile: selectedTile })}>
+      {reward && active ? <button className="cm-primary cm-assign" onClick={assignWithHeart}>
         ASSIGN {request.name.toUpperCase()} · +{reward.total}{reward.exact ? ' PERFECT' : ''}</button>
         : <p className="cm-feedback" role="status" aria-live="polite">{round ? state.message : 'Swipe or tap arrows to merge equal hours.'}</p>}
       {active && <div className="cm-actions"><button className="cm-undo" disabled={state.undoUsed || !state.previous} onClick={() => act({ type: 'undo' })}>↶ Undo</button>
@@ -137,10 +166,13 @@ export default function CareMatch() {
         <button className="cm-link" disabled={busy} onClick={() => start(round.mode === 'practice')}>Play again</button>
       </div>}
       {notice && <p className="cm-success" role="status">{notice}</p>}{error && <p className="cm-error" role="alert">{error}</p>}
+      </div>
+      <aside className="cm-sidebar" aria-label="Instructions and leaderboard">
       <details className="cm-help"><summary>How to play</summary><p>Swipe or use arrows to merge equal hours. Select a member, tap enough hours, then assign. Exact and early matches earn extra points. Three missed requests end the shift; you get 60 moves.</p></details>
       <div className="cm-ranking-heading"><h3>ALL-TIME TOP 5</h3><button className="cm-link" onClick={refresh}>↻ Refresh</button></div>
       <Ranking rows={boards?.allTime} />
       {boardError && <p className="cm-error" role="status">{boardError}</p>}
+      </aside>
     </div>
   </section>
 }
