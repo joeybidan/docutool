@@ -8,11 +8,12 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm run test:news && vite build",
+    "build": "npm run test:news && npm run test:presence && vite build",
     "preview": "vite preview",
     "test:carematch": "node --test tests/carematch.test.mjs",
     "test:time-tools": "node --test tests/time-tools.test.mjs",
-    "test:news": "node --test tests/caregiver-news.test.mjs"
+    "test:news": "node --test tests/caregiver-news.test.mjs",
+    "test:presence": "node --test tests/visitor-presence.test.mjs"
   },
   "dependencies": {
     "@netlify/blobs": "11.1.0",
