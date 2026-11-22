@@ -48,6 +48,22 @@ export async function resolveZipArea(zip, options = {}) {
   }
 }
 
+/**
+ * A broad, illustrative planning range ONLY. No routing, road/traffic or address data is used.
+ * Assumptions: roughly 20% road detour versus ZIP-center straight line, and approximate
+ * average speeds from 25 to 55 mph by distance. This is NOT a real traffic-aware ETA.
+ * Very short ZIP-center separations cannot support a meaningful drive-time guess.
+ */
+export function estimateModerateTrafficPlanningMinutes(straightMiles) {
+  if (!Number.isFinite(straightMiles) || straightMiles < 2) return null
+  const averageMph = straightMiles < 5 ? 25 : straightMiles < 15 ? 35 :
+    straightMiles < 70 ? 48 : 55
+  const midpointMinutes = (straightMiles * 1.2 / averageMph) * 60
+  const minMinutes = Math.max(5, Math.round((midpointMinutes * 0.75) / 5) * 5)
+  const maxMinutes = Math.max(minMinutes + 5, Math.ceil((midpointMinutes * 1.35) / 5) * 5)
+  return { minMinutes, maxMinutes }
+}
+
 export async function calculateZipDistance(caregiverValue, clientValue, options = {}) {
   const caregiverInput = parseUsArea(caregiverValue)
   const clientInput = parseUsArea(clientValue)
@@ -71,6 +87,7 @@ export async function calculateZipDistance(caregiverValue, clientValue, options 
     caregiver, client,
     miles: Math.round(miles),
     kilometers: Math.round(miles * 1.609344),
+    moderateTrafficPlanning: estimateModerateTrafficPlanningMinutes(miles),
   }
 }
 

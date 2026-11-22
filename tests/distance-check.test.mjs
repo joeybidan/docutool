@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
   ZIP_API_BASE, parseUsArea, straightLineMiles, resolveZipArea,
-  calculateZipDistance, googleMapsDirectionsUrl,
+  calculateZipDistance, googleMapsDirectionsUrl, estimateModerateTrafficPlanningMinutes,
 } from '../src/utils/distanceCheck.js'
 
 test('reads ZIP only or optional city/state and ZIP+4', () => {
@@ -66,4 +66,35 @@ test('Google Maps directions link contains validated ZIPs and driving mode', () 
   assert.equal(link.searchParams.get('travelmode'),'driving')
   assert.equal(link.searchParams.get('origin'),'98101, USA')
   assert.equal(link.searchParams.get('destination'),'90210, USA')
+})
+
+
+test('rough moderate-traffic minutes use a broad interval, never a false live ETA', () => {
+  const estimate = estimateModerateTrafficPlanningMinutes(18)
+  assert.deepEqual(estimate, { minMinutes:20, maxMinutes:40 })
+  assert.equal(estimateModerateTrafficPlanningMinutes(0), null)
+  assert.equal(estimateModerateTrafficPlanningMinutes(1.5), null)
+  assert.equal(estimateModerateTrafficPlanningMinutes(-1), null)
+  assert.equal(estimateModerateTrafficPlanningMinutes(Number.NaN), null)
+  assert.equal(estimateModerateTrafficPlanningMinutes(Number.POSITIVE_INFINITY), null)
+  const farther = estimateModerateTrafficPlanningMinutes(50)
+  assert.ok(farther.maxMinutes > estimate.maxMinutes)
+})
+
+test('distance calculator attaches planning range without calling a road/traffic service', async () => {
+  const urls = []
+  const result = await calculateZipDistance('Seattle, WA 98101','Beverly Hills, CA 90210',{
+    fetchImpl: async url => { urls.push(url); return fakeFetch(url) },
+  })
+  assert.deepEqual(urls, [ZIP_API_BASE+'98101', ZIP_API_BASE+'90210'])
+  assert.deepEqual(result.moderateTrafficPlanning,
+    estimateModerateTrafficPlanningMinutes(straightLineMiles(result.caregiver,result.client)))
+})
+
+test('street address text is ignored in ZIP-only lookup', async () => {
+  const urls=[]
+  await calculateZipDistance('2065 Sanders Road, Seattle, WA 98101', '310 Jackson St, Beverly Hills, CA 90210', {
+    fetchImpl: async url => { urls.push(url); return fakeFetch(url) },
+  })
+  assert.deepEqual(urls,[ZIP_API_BASE+'98101',ZIP_API_BASE+'90210'])
 })

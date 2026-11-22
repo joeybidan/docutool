@@ -95,3 +95,21 @@
 .docutool-mini .docutool-mini__option--favorite .favorite-template-option__label>span {
   font-size:11.5px;line-height:1.4;
 }
+
+
+/* Rough, transparent moderate-traffic *planning* time, not a routes API result. */
+.distance-check__eta {
+  display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 9px;
+  border:1px solid #c5d9ee;border-radius:7px;background:#eef6ff;color:#26548e;
+}
+.distance-check__eta-copy {
+  display:flex;flex-direction:column;gap:3px;min-width:0;
+}
+.distance-check__eta-copy b {
+  color:#1e4f92;font-size:14px;font-weight:850;line-height:1.2;
+}
+.distance-check__eta .distance-check__eta-copy small {
+  color:#56728f;font-size:10px;line-height:1.45;
+}
+.docutool-mini .distance-check__eta {margin-top:6px;padding:7px;}
+.docutool-mini .distance-check__eta-copy b {font-size:13px;}
