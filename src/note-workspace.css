@@ -19,3 +19,64 @@
 .notes-workspace .note-actions { flex-wrap:wrap; }
 .notes-workspace .note-color { white-space:nowrap; }
 .notes-workspace .autosave-status { flex-basis:100%; text-align:right; }
+
+
+/* Phase 1 refinement: flexible note height in dashboard, Focus and Mini.
+   No JavaScript height measurements: contentEditable grows naturally when
+   height is auto; after a manual resize, Fit Content clears the override. */
+.notes-workspace {
+  grid-template-rows:auto auto auto auto;
+  min-height:0;
+  height:auto;
+  align-content:start;
+  overflow:visible;
+}
+.note-editor-area {min-width:0;}
+.note-editor-shell {overflow:visible;}
+.notes-workspace .rich-note-editor {
+  display:block;
+  box-sizing:border-box;
+  width:100%;
+  height:auto;
+  min-height:220px;
+  max-height:none;
+  resize:vertical;
+  overflow-y:auto;
+}
+.focus-workspace .notes-workspace {min-height:0;}
+.focus-workspace .notes-workspace .rich-note-editor {min-height:clamp(220px,30vh,520px);}
+.docutool-mini .notes-workspace {min-height:0; height:auto;}
+.docutool-mini .notes-workspace .rich-note-editor {min-height:180px; height:auto; max-height:none;}
+.docutool-mini--page .notes-workspace .rich-note-editor {min-height:clamp(220px,30vh,440px);}
+.note-editor-resize-tools {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:9px;
+  padding:0 13px 7px;
+  font-size:10px;
+  color:#687d99;
+}
+.note-editor-resize-tools button {
+  flex:0 0 auto;
+  padding:4px 9px;
+  border:1px solid #bbcee5;
+  border-radius:6px;
+  background:#f4f8ff;
+  color:#28558f;
+  font-size:10px;
+  font-weight:750;
+  cursor:pointer;
+}
+.note-editor-resize-tools button:hover,
+.note-editor-resize-tools button:focus-visible {
+  background:#e4efff;
+  border-color:#6496d4;
+}
+.docutool-mini .note-editor-resize-tools {
+  padding:0 8px 6px;
+  font-size:9px;
+}
+@media(max-width:500px) {
+  .note-editor-resize-tools span {font-size:9px;}
+}

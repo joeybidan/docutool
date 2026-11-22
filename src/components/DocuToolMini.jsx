@@ -1,4 +1,5 @@
 import { NotesWorkspace } from './NotesWorkspace.jsx'
+import { VisitorCounter } from './VisitorCounter.jsx'
 import { useMemo, useState } from 'react'
 import {
   ChevronDown,
@@ -104,6 +105,9 @@ export function DocuToolMini({
         <div className="docutool-mini__identity">
           <strong>DocuTool Mini</strong>
           <span>{mode === 'pip' ? 'Always-on-top notepad' : 'Your compact documentation workspace'}</span>
+          <div className="docutool-mini__live-count" aria-label="Online DocuTool visitors">
+            <VisitorCounter />
+          </div>
         </div>
         <div className="docutool-mini__header-actions">
           {mode === 'page' ? (

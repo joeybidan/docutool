@@ -42,8 +42,8 @@
 .focus-workspace__helper>.panel,.focus-workspace__capture>.panel {
   max-height:none;width:100%;border:0;box-shadow:none;border-radius:0;
 }
-.focus-workspace>.notes-workspace {min-height:max(500px,calc(100vh - 270px));}
-.focus-workspace .notes-workspace .note-editor {min-height:46vh;}
+.focus-workspace>.notes-workspace {min-height:0;}
+.focus-workspace .notes-workspace .note-editor {min-height:clamp(220px,30vh,520px);}
 .focus-workspace__capture .audio-capture textarea {min-height:110px;}
 /* Mini editor comes before all optional tools; an icon rail opens drawers. */
 .docutool-mini__header .docutool-mini__identity {display:grid;}
@@ -82,7 +82,7 @@
 }
 .docutool-mini__primary {min-width:0;}
 .docutool-mini__primary>.docutool-mini__notepad {margin-bottom:8px;}
-.docutool-mini__primary .note-editor {min-height:260px;}
+.docutool-mini__primary .note-editor {min-height:180px;}
 .docutool-mini__primary .note-editor-shell {margin:8px 8px 5px;}
 .docutool-mini__primary .note-actions {padding-bottom:9px;}
 .docutool-mini__primary .note-tools {padding-top:5px;}
@@ -131,7 +131,9 @@
 .docutool-mini--page .docutool-mini__rail button {min-height:62px;}
 .docutool-mini--page .docutool-mini__drawer {left:70px;}
 .docutool-mini--page .docutool-mini__primary .note-editor {
-  min-height:46vh;height:53vh;max-height:62vh;
+  min-height:clamp(220px,30vh,440px);
+  height:auto;
+  max-height:none;
 }
 @media(max-width:600px) {
   .quick-access-links .quick-access-focus {padding:0 8px;}
@@ -139,4 +141,37 @@
   .docutool-mini--page .docutool-mini__scroll {padding:9px;}
   .docutool-mini__header {flex-wrap:wrap;}
   .focus-workspace__helpers {display:grid;}
+}
+
+/* Keep visitor presence visible at the right of Focus View's title bar. */
+.section-page__live-count {
+  margin-left:auto;
+  padding:8px 11px;
+  flex:0 0 auto;
+  border:1px solid #b9d7ee;
+  border-radius:999px;
+  background:#f0f8ff;
+}
+.section-page__live-count .visitor-counter {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  font-weight:700;
+}
+.section-page__live-count .visitor-counter strong {font-size:12px;}
+.docutool-mini__live-count {
+  width:max-content;
+  max-width:100%;
+  margin-top:4px;
+  padding:3px 7px;
+  border:1px solid #d4e5f5;
+  border-radius:999px;
+  background:#f2f7ff;
+}
+.docutool-mini__live-count .visitor-counter {display:flex;gap:5px;font-size:10px;white-space:nowrap;}
+.docutool-mini__live-count .visitor-counter strong {font-size:10px;}
+@media(max-width:520px) {
+  .section-page__bar {flex-wrap:wrap;}
+  .section-page__live-count {margin-left:0;}
 }

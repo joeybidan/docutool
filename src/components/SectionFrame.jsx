@@ -1,4 +1,5 @@
 import { ArrowLeft, Maximize2 } from 'lucide-react'
+import { VisitorCounter } from './VisitorCounter.jsx'
 
 export const SECTION_META = {
   notestemplates: { label: 'Note Templates' },
@@ -63,6 +64,11 @@ export function SectionPage({ slug, label, children }) {
           <span>Focused view</span>
           <h1>{label}</h1>
         </div>
+        {slug === 'notepad' && (
+          <div className="section-page__live-count" aria-label="DocuTool online visitor counter">
+            <VisitorCounter />
+          </div>
+        )}
       </div>
       <div className="section-page__content">{children}</div>
     </main>

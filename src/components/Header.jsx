@@ -5,7 +5,7 @@ import { Button } from './ui/Button.jsx'
 import { TimezoneClocks } from './TimezoneClocks.jsx'
 import { VisitorCounter } from './VisitorCounter.jsx'
 
-export function Header({ onOpenAdmin, onOpenMini }) {
+export function Header({ onOpenAdmin, onOpenMini, showVisitorCounter = true }) {
   return (
     <header className="app-header">
       <div className="brand-group">
@@ -13,7 +13,7 @@ export function Header({ onOpenAdmin, onOpenMini }) {
           Docu<span>Tool</span>
         </a>
         <HourlyQuote />
-        <VisitorCounter />
+        {showVisitorCounter && <VisitorCounter />}
       </div>
 
       <QuickAccessLinks onOpenMini={onOpenMini} />

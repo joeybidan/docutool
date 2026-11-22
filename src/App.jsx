@@ -351,7 +351,8 @@ function App() {
   if (isFocusedSection) {
     return (
       <div className="app-shell">
-        <Header onOpenAdmin={() => setIsAdminOpen(true)} onOpenMini={openMini} />
+        <Header onOpenAdmin={() => setIsAdminOpen(true)} onOpenMini={openMini}
+          showVisitorCounter={requestedSection !== 'notepad'} />
 
         <SectionPage slug={requestedSection} label={SECTION_META[requestedSection].label}>
           {requestedSection === 'notepad' ? (
