@@ -13,7 +13,7 @@ export function NotesWorkspace({
   activeIndex,
   names, html, onAdd, onRename, onDelete, saveError,
   templates, favoriteTemplateIds, onInsertFavorite,
-  compactDistance = false,
+  compactDistance = false, onAddDistance,
   note,
   onActiveIndexChange,
   onNoteChange,
@@ -27,7 +27,7 @@ export function NotesWorkspace({
   const editorRef = useRef(null)
   return (
     <section className="panel notes-workspace" aria-label="Advanced notepad">
-      <QuickDistanceCheck compact={compactDistance} />
+      <QuickDistanceCheck compact={compactDistance} onAddToNote={onAddDistance} noteName={names[activeIndex]} />
       <NoteTools note={note} html={html} name={names[activeIndex]} />
       <NoteTabs activeIndex={activeIndex} onChange={onActiveIndexChange} names={names}
         onAdd={onAdd} onRename={onRename} onDelete={onDelete} note={note} />

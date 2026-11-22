@@ -31,6 +31,7 @@ export function DocuToolMini({
   onNoteChange,
   onGenerate,
   onAddWrapUp,
+  onAddDistance,
   onCopy,
   onClearNote,
   onUncheck,
@@ -162,7 +163,7 @@ export function DocuToolMini({
             compactDistance
             onActiveIndexChange={onActiveNoteIndexChange} onNoteChange={onNoteChange}
             onGenerate={handleGenerate} onCopy={handleCopy} onClear={onClearNote}
-            onAddWrapUp={onAddWrapUp}
+            onAddWrapUp={onAddWrapUp} onAddDistance={onAddDistance}
             onUncheck={handleUncheck} selectedCount={selectedCount} />
 
           <p className={`docutool-mini__status docutool-mini__status--${statusType}`} aria-live="polite">

@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronDown, ChevronRight, Clock3, ExternalLink, MapPin, Route } from 'lucide-react'
-import { calculateZipDistance, googleMapsDirectionsUrl } from '../utils/distanceCheck.js'
+import { ChevronDown, ChevronRight, Clock3, ExternalLink, FilePlus2, MapPin, Route } from 'lucide-react'
+import { calculateZipDistance, formatDistanceEstimateForNote, googleMapsDirectionsUrl } from '../utils/distanceCheck.js'
 
 // Designed to take a single compact line when collapsed in floating Mini.
 // ZIP-only lookup: never upload or persist entered street-address text. Only the ZIP is queried.
-export function QuickDistanceCheck({ compact = false }) {
+export function QuickDistanceCheck({ compact = false, onAddToNote, noteName }) {
   const [expanded, setExpanded] = useState(!compact)
   const [caregiverArea, setCaregiverArea] = useState('')
   const [clientArea, setClientArea] = useState('')
   const [distance, setDistance] = useState(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [includeDistance, setIncludeDistance] = useState(false)
+  const [includeEta, setIncludeEta] = useState(false)
+  const [noteStatus, setNoteStatus] = useState('')
   const abortRef = useRef(null)
 
   useEffect(() => () => { abortRef.current?.abort() }, [])
@@ -20,6 +23,9 @@ export function QuickDistanceCheck({ compact = false }) {
     setLoading(false)
     setError('')
     setDistance(null)
+    setIncludeDistance(false)
+    setIncludeEta(false)
+    setNoteStatus('')
     setter(value)
   }
 
@@ -31,6 +37,9 @@ export function QuickDistanceCheck({ compact = false }) {
     setLoading(true)
     setError('')
     setDistance(null)
+    setIncludeDistance(false)
+    setIncludeEta(false)
+    setNoteStatus('')
     try {
       const result = await calculateZipDistance(caregiverArea, clientArea, {
         signal: controller.signal,
@@ -48,6 +57,18 @@ export function QuickDistanceCheck({ compact = false }) {
   const mapsUrl = distance
     ? googleMapsDirectionsUrl(distance.caregiver.zip, distance.client.zip)
     : ''
+  const canIncludeTime = Boolean(distance?.moderateTrafficPlanning)
+  const hasSelectedDetail = includeDistance || (includeEta && canIncludeTime)
+
+  function addSelectedToNote() {
+    if (!hasSelectedDetail || !onAddToNote || !distance) return
+    const block = formatDistanceEstimateForNote(distance, includeDistance, includeEta && canIncludeTime)
+    if (!block) return
+    onAddToNote(block)
+    setIncludeDistance(false)
+    setIncludeEta(false)
+    setNoteStatus('Selected distance details added to ' + (noteName || 'the active note') + '.')
+  }
 
   return (
     <section className="distance-check" aria-label="Quick caregiver and client distance check">
@@ -109,6 +130,31 @@ export function QuickDistanceCheck({ compact = false }) {
                 aria-label="Open driving directions in Google Maps, new tab">
                 Driving route <ExternalLink size={14} aria-hidden="true" />
               </a>
+            </div>
+          )}
+          {distance && onAddToNote && (
+            <div className="distance-check__note-inclusion">
+              <fieldset className="distance-check__note-fields">
+                <legend>Include in {noteName || 'current note'} (optional)</legend>
+                <label>
+                  <input type="checkbox" checked={includeDistance}
+                    onChange={event => { setIncludeDistance(event.target.checked); setNoteStatus('') }} />
+                  <span>Distance</span>
+                </label>
+                {canIncludeTime && (
+                  <label>
+                    <input type="checkbox" checked={includeEta}
+                      onChange={event => { setIncludeEta(event.target.checked); setNoteStatus('') }} />
+                    <span>Estimated time</span>
+                  </label>
+                )}
+              </fieldset>
+              <button type="button" className="distance-check__add-note"
+                onClick={addSelectedToNote} disabled={!hasSelectedDetail}>
+                <FilePlus2 size={14} aria-hidden="true" />
+                Add checked to note
+              </button>
+              {noteStatus && <p className="distance-check__note-status" role="status">{noteStatus}</p>}
             </div>
           )}
           <p className="distance-check__hint">

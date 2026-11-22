@@ -91,6 +91,41 @@ export async function calculateZipDistance(caregiverValue, clientValue, options 
   }
 }
 
+/**
+ * Format only the explicitly selected values for insertion into the active note.
+ * Deliberately distinguish approximate straight-line mileage and modelled time
+ * from Google Maps driving directions. Never include street addresses.
+ */
+export function formatDistanceEstimateForNote(result, includeDistance, includeEta) {
+  if (!result || (!includeDistance && !includeEta)) return ''
+  const caregiver = result.caregiver
+  const client = result.client
+  if (!caregiver || !client) return ''
+  const area = location => [
+    String(location.city || '').replace(/\s+/g, ' ').trim().slice(0, 90),
+    String(location.state || '').replace(/\s+/g, ' ').trim().slice(0, 3),
+    String(location.zip || '').replace(/[^\d]/g, '').slice(0, 5),
+  ].filter(Boolean).join(' ')
+  const lines = [
+    'CAREGIVER / CLIENT DISTANCE — ZIP-based estimate',
+    'Caregiver area: ' + area(caregiver),
+    'Client area: ' + area(client),
+  ]
+  if (includeDistance && Number.isFinite(result.miles) && Number.isFinite(result.kilometers)) {
+    lines.push('Approx. straight-line distance between ZIP centers: ' +
+      result.miles + ' miles (' + result.kilometers + ' km). Not driving distance.')
+  }
+  if (includeEta) {
+    const planning = result.moderateTrafficPlanning
+    if (planning && Number.isFinite(planning.minMinutes) && Number.isFinite(planning.maxMinutes)) {
+      lines.push('Rough drive-time planning range (assumed moderate traffic): ~' +
+        planning.minMinutes + '–' + planning.maxMinutes +
+        ' minutes. NOT live traffic or a verified route ETA.')
+    }
+  }
+  return lines.length > 3 ? lines.join('\n') : ''
+}
+
 export function googleMapsDirectionsUrl(caregiverZip, clientZip) {
   if (!/^\d{5}$/.test(caregiverZip) || !/^\d{5}$/.test(clientZip)) return ''
   const params = new URLSearchParams({

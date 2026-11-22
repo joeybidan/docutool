@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import {
   ZIP_API_BASE, parseUsArea, straightLineMiles, resolveZipArea,
   calculateZipDistance, googleMapsDirectionsUrl, estimateModerateTrafficPlanningMinutes,
+  formatDistanceEstimateForNote,
 } from '../src/utils/distanceCheck.js'
 
 test('reads ZIP only or optional city/state and ZIP+4', () => {
@@ -97,4 +98,31 @@ test('street address text is ignored in ZIP-only lookup', async () => {
     fetchImpl: async url => { urls.push(url); return fakeFetch(url) },
   })
   assert.deepEqual(urls,[ZIP_API_BASE+'98101',ZIP_API_BASE+'90210'])
+})
+
+
+test('explicitly selected distance and/or estimated time can be inserted in a note', () => {
+  const distance = {
+    caregiver: {city:'Stem',state:'NC',zip:'27581'},
+    client: {city:'Durham',state:'NC',zip:'27701'},
+    miles:18, kilometers:30,
+    moderateTrafficPlanning:{minMinutes:20,maxMinutes:40},
+  }
+  const none = formatDistanceEstimateForNote(distance,false,false)
+  assert.equal(none,'')
+  const distanceOnly = formatDistanceEstimateForNote(distance,true,false)
+  assert.match(distanceOnly,/18 miles/)
+  assert.match(distanceOnly,/straight-line/)
+  assert.doesNotMatch(distanceOnly,/20–40/)
+  const timeOnly = formatDistanceEstimateForNote(distance,false,true)
+  assert.match(timeOnly,/20–40 minutes/)
+  assert.match(timeOnly,/NOT live traffic/)
+  assert.doesNotMatch(timeOnly,/18 miles/)
+  const both = formatDistanceEstimateForNote(distance,true,true)
+  assert.match(both,/Stem NC 27581/)
+  assert.match(both,/Durham NC 27701/)
+  assert.match(both,/18 miles/)
+  assert.match(both,/20–40 minutes/)
+  assert.match(both,/Not driving distance/)
+  assert.equal(formatDistanceEstimateForNote({...distance,moderateTrafficPlanning:null},false,true),'')
 })

@@ -114,6 +114,12 @@ function App() {
     notify(`Call wrap-up added to ${noteNames[activeNoteIndex]}.`)
   }, [activeNoteIndex, noteNames, notify, updateNote])
 
+  const handleAddDistance = useCallback((block) => {
+    if (!block || typeof block !== 'string') return
+    updateNote(activeNoteIndex, (currentText) => appendTextBlock(currentText, block))
+    notify('Selected distance details added to ' + noteNames[activeNoteIndex] + '.')
+  }, [activeNoteIndex, noteNames, notify, updateNote])
+
   const handleMiniClearNote = useCallback(() => {
     updateNote(activeNoteIndex, '')
     notify(`${noteNames[activeNoteIndex]} cleared.`)
@@ -148,6 +154,7 @@ function App() {
     onNoteChange: (value, html) => updateNote(activeNoteIndex, value, html),
     onGenerate: handleMiniGenerate,
     onAddWrapUp: handleAddWrapUp,
+    onAddDistance: handleAddDistance,
     onCopy: handleMiniCopy,
     onClearNote: handleMiniClearNote,
     onUncheck: () => setSelectedIds(new Set()),
@@ -267,6 +274,7 @@ function App() {
             onNoteChange={(value, html) => updateNote(activeNoteIndex, value, html)}
             onGenerate={handleGenerate}
             onAddWrapUp={handleAddWrapUp}
+            onAddDistance={handleAddDistance}
             onCopy={handleCopy}
             onClear={handleClear}
             onUncheck={handleUncheck}
