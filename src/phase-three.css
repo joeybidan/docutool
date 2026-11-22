@@ -1,0 +1,44 @@
+/* Phase 3 - local Review & Copy. Intentionally compact inside dashboard and Mini. */
+.review-copy__trigger {display:inline-flex;align-items:center;gap:6px;}
+.review-copy__count {
+  display:inline-grid;place-items:center;min-width:19px;height:19px;
+  padding:0 4px;border-radius:99px;background:#fff0ce;color:#855300;
+  font-size:11px;font-weight:850;line-height:1;
+}
+.review-copy__panel {
+  flex:1 1 100%;order:90;box-sizing:border-box;min-width:0;
+  margin:7px 0 3px;padding:13px;border:1px solid #a9c6ea;
+  border-radius:11px;background:#f8fbff;
+  color:#1e3758;box-shadow:0 4px 13px rgb(35 77 130 / .10);
+}
+.review-copy__heading {display:flex;justify-content:space-between;align-items:flex-start;gap:9px;}
+.review-copy__heading strong {font-size:14px;color:#184b93;}
+.review-copy__heading p {margin:4px 0 7px;font-size:11px;line-height:1.45;color:#4c6684;}
+.review-copy__dismiss {
+  display:grid;place-items:center;flex:0 0 auto;width:26px;height:26px;
+  padding:0;border:1px solid #cad9ec;border-radius:7px;background:#fff;
+  color:#536c8f;cursor:pointer;
+}
+.review-copy__list {list-style:none;margin:4px 0 9px;padding:0;display:grid;gap:6px;}
+.review-copy__list li {
+  display:flex;gap:8px;align-items:flex-start;padding:9px;
+  border:1px solid #d8e5f1;border-radius:8px;background:#fff;
+}
+.review-copy__list li>svg {flex:0 0 auto;margin-top:1px;}
+.review-copy__list li>span {display:grid;gap:3px;}
+.review-copy__list li strong {font-size:11px;color:#1c3d67;}
+.review-copy__list li small {font-size:10px;line-height:1.5;color:#597088;}
+.review-copy__list .review-copy__found>svg {color:#16804a;}
+.review-copy__list .review-copy__missing {background:#fffbf2;border-color:#efdaaf;}
+.review-copy__list .review-copy__missing>svg {color:#ae6b10;}
+.review-copy__disclaimer {margin:7px 0;font-size:10px;line-height:1.5;color:#617189;}
+.review-copy__error {font-size:11px;color:#b91c1c;margin:6px 0;}
+.review-copy__buttons {display:flex;justify-content:flex-end;flex-wrap:wrap;gap:7px;margin-top:10px;}
+.review-copy__buttons .button {display:inline-flex;gap:6px;align-items:center;justify-content:center;}
+.docutool-mini .review-copy__panel {padding:9px;margin:7px 0 0;}
+.docutool-mini .review-copy__list {gap:5px;}
+.docutool-mini .review-copy__list li {padding:7px;}
+.docutool-mini .review-copy__heading strong {font-size:12px;}
+@media(max-width:440px) {
+  .review-copy__buttons .button {flex:1 1 auto;white-space:normal;}
+}

@@ -36,6 +36,7 @@ import './time-tools.css'
 import './section-pages.css'
 import './phase-one.css'
 import './phase-two.css'
+import './phase-three.css'
 
 function App() {
   const {
@@ -182,9 +183,10 @@ function App() {
   const handleCopy = async () => {
     try {
       await copyToClipboard(activeNote, window, noteHtml[activeNoteIndex])
-      notify(`${noteNames[activeNoteIndex]} copied to clipboard.`)
+      notify(noteNames[activeNoteIndex] + ' copied to clipboard.')
     } catch (error) {
       notify(error.message, 'error')
+      throw error
     }
   }
 

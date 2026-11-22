@@ -91,6 +91,7 @@ export function DocuToolMini({
       setSuccess(message || `${noteNames[activeNoteIndex]} copied.`)
     } catch (error) {
       setError(error.message || 'Could not copy the note.')
+      throw error
     }
   }
 

@@ -1,9 +1,10 @@
 import { useRef } from 'react'
 import { NoteTools } from './NoteTools.jsx'
-import { Copy, Eraser, ListX, Sparkles } from 'lucide-react'
+import { Eraser, ListX, Sparkles } from 'lucide-react'
 import { NoteEditor, FormatControls } from './NoteEditor.jsx'
 import { NoteTabs } from './NoteTabs.jsx'
 import { QuickCallWrapUp } from './QuickCallWrapUp.jsx'
+import { ReviewCopyPanel } from './ReviewCopyPanel.jsx'
 import { Button } from './ui/Button.jsx'
 
 export function NotesWorkspace({
@@ -32,10 +33,8 @@ export function NotesWorkspace({
           Generate
           {selectedCount > 0 && <span className="button-count">{selectedCount}</span>}
         </Button>
-        <Button type="button" onClick={onCopy} disabled={!note}>
-          <Copy size={16} />
-          Copy
-        </Button>
+        <ReviewCopyPanel note={note} noteName={names[activeIndex]} activeIndex={activeIndex}
+          onCopy={onCopy} editorRef={editorRef} />
         <Button type="button" onClick={onClear} disabled={!note}>
           <Eraser size={16} />
           Clear
