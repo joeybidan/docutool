@@ -10,31 +10,18 @@ export function NoteEditor({ activeIndex, value, html, onChange, editorRef }) {
     if (sanitizeHtml(node.innerHTML, node.ownerDocument) !== clean) node.innerHTML = clean
   }, [activeIndex, value, html, ref])
   function publish(node) { onChange(node.innerText, sanitizeHtml(node.innerHTML, node.ownerDocument)) }
-  function fitContent() {
-    const node = ref.current
-    if (node) node.style.height = 'auto'
-  }
-  return <div className="note-editor-area">
-    <div className="note-editor-shell">
-      <div ref={ref} className="note-editor rich-note-editor" role="textbox" aria-label="Note content"
-        aria-multiline="true" contentEditable suppressContentEditableWarning spellCheck="true"
-        title="The notepad grows as you type. Drag its bottom-right corner to resize."
-        onInput={event => publish(event.currentTarget)}
-        onPaste={event => {
-          event.preventDefault()
-          const node = event.currentTarget
-          const doc = node.ownerDocument
-          const html = event.clipboardData.getData('text/html')
-          doc.execCommand('insertHTML', false, html ? sanitizeHtml(html, doc) : textToHtml(event.clipboardData.getData('text/plain')))
-          publish(node)
-        }} />
-    </div>
-    <div className="note-editor-resize-tools">
-      <span>Grows with your writing · Drag the bottom-right corner to resize</span>
-      <button type="button" onClick={fitContent} title="Return to automatic height based on note contents">
-        Fit Content
-      </button>
-    </div>
+  return <div className="note-editor-shell">
+    <div ref={ref} className="note-editor rich-note-editor" role="textbox" aria-label="Note content"
+      aria-multiline="true" contentEditable suppressContentEditableWarning spellCheck="true"
+      onInput={event => publish(event.currentTarget)}
+      onPaste={event => {
+        event.preventDefault()
+        const node = event.currentTarget
+        const doc = node.ownerDocument
+        const html = event.clipboardData.getData('text/html')
+        doc.execCommand('insertHTML', false, html ? sanitizeHtml(html, doc) : textToHtml(event.clipboardData.getData('text/plain')))
+        publish(node)
+      }} />
   </div>
 }
 
