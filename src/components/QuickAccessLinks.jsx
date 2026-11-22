@@ -1,3 +1,4 @@
+import { Maximize2, NotebookPen } from 'lucide-react'
 const QUICK_LINKS = [
   { label: 'SNOW (CTS)', url: 'https://ctsccprod.service-now.com/ss' },
   { label: 'Jira (SC)', url: 'https://arnoldmedia.jira.com/servicedesk/customer/portals?isEligibleForUserSurvey=true' },
@@ -37,14 +38,16 @@ function clearDocuToolCookies() {
 export function QuickAccessLinks({ onOpenMini }) {
   return (
     <nav className="quick-access-links" aria-label="Agent quick access links">
-      <button
-        type="button"
-        className="quick-access-mini"
-        onClick={onOpenMini}
-        title="Open the floating DocuTool Mini checklist"
-      >
-        Open Mini
+      <a href="/notepad" className="quick-access-focus" title="Open the full-page Focus Notepad">
+        <Maximize2 size={15} aria-hidden="true" /> Focus Notepad
+      </a>
+      <button type="button" className="quick-access-mini" onClick={onOpenMini}
+        title="Open the floating DocuTool Mini notepad">
+        <NotebookPen size={17} aria-hidden="true" /> Open Mini
       </button>
+      <a href="/docutoolmini" className="quick-access-mini-page" title="Use DocuTool Mini as a separate page">
+        Mini Page
+      </a>
       {QUICK_LINKS.map((item) => (
         <a
           key={item.label}

@@ -5,6 +5,7 @@ import { AppFooter } from './components/AppFooter.jsx'
 import { AudioCapture } from './components/AudioCapture.jsx'
 import { CallbackList } from './components/CallbackList.jsx'
 import { CareMatchLauncher } from './components/CareMatchLauncher.jsx'
+import { DocuToolMini } from './components/DocuToolMini.jsx'
 import { Header } from './components/Header.jsx'
 import { HolidaysPanel } from './components/HolidaysPanel.jsx'
 import { CarelinxNewsPanel } from './components/HealthcareNewsPanel.jsx'
@@ -32,6 +33,7 @@ import {
 import './feature-updates.css'
 import './time-tools.css'
 import './section-pages.css'
+import './phase-one.css'
 
 function App() {
   const {
@@ -114,7 +116,7 @@ function App() {
     audioCapture.clearCapturedText()
   }, [audioCapture])
 
-  const { openMini, miniPortal } = useDocuToolMini({
+  const miniWorkspaceProps = {
     templates,
     selectedIds,
     onToggle: handleTemplateToggle,
@@ -137,7 +139,8 @@ function App() {
     onClearCaptured: audioCapture.clearCapturedText,
     onAppendCaptured: handleAppendCaptured,
     onNotify: notify,
-  })
+  }
+  const { openMini, miniPortal } = useDocuToolMini(miniWorkspaceProps)
 
   const handleTemplatesChange = (nextTemplates) => {
     setTemplates(nextTemplates)
@@ -331,13 +334,45 @@ function App() {
 
   const isFocusedSection = Boolean(requestedSection && SECTION_META[requestedSection])
 
+  // Standalone Mini works even where browser popup/Picture-in-Picture is blocked.
+  if (requestedSection === 'docutoolmini') {
+    return (
+      <div className="docutool-mini-page">
+        <DocuToolMini {...miniWorkspaceProps} mode="page"
+          onOpenFloating={openMini}
+          onClose={() => { window.location.href = '/' }}
+          onCopy={() => handleMiniCopy(window)} />
+        <Toast toast={toast} onDismiss={() => setToast(null)} />
+        {miniPortal}
+      </div>
+    )
+  }
+
   if (isFocusedSection) {
     return (
       <div className="app-shell">
         <Header onOpenAdmin={() => setIsAdminOpen(true)} onOpenMini={openMini} />
 
         <SectionPage slug={requestedSection} label={SECTION_META[requestedSection].label}>
-          {renderSection(requestedSection)}
+          {requestedSection === 'notepad' ? (
+            <div className="focus-workspace">
+              <div className="focus-workspace__helpers" aria-label="Optional documentation tools">
+                <details className="focus-workspace__helper">
+                  <summary>Note Templates <span>Open when needed</span></summary>
+                  {renderSection('notestemplates')}
+                </details>
+                <details className="focus-workspace__helper">
+                  <summary>Knowledge Base Search <span>Open when needed</span></summary>
+                  {renderSection('knowledgebasesearch')}
+                </details>
+              </div>
+              {renderSection('notepad')}
+              <details className="focus-workspace__capture">
+                <summary>Captured Conversation <span>Expand to type or transcribe</span></summary>
+                {renderSection('capturedconversation')}
+              </details>
+            </div>
+          ) : renderSection(requestedSection)}
         </SectionPage>
 
         <AppFooter />

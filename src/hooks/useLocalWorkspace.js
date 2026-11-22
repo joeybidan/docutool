@@ -1,14 +1,42 @@
-import { useCallback, useEffect, useState } from 'react'
-import { loadLocalWorkspace, saveLocalWorkspace } from '../services/localStorageService.js'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  LOCAL_STORAGE_KEY,
+  loadLocalWorkspace,
+  parseStoredWorkspace,
+  saveLocalWorkspace,
+} from '../services/localStorageService.js'
 import { textToHtml } from '../utils/richText.js'
 
 export function useLocalWorkspace() {
   const [workspace, setWorkspace] = useState(loadLocalWorkspace)
   const [saveError, setSaveError] = useState(false)
+  const lastRemoteSnapshot = useRef(null)
 
   useEffect(() => {
+    // Do not write an incoming update back to localStorage and cause an echo loop.
+    if (lastRemoteSnapshot.current === JSON.stringify(workspace)) {
+      lastRemoteSnapshot.current = null
+      setSaveError(false)
+      return
+    }
     setSaveError(!saveLocalWorkspace(workspace))
   }, [workspace])
+
+  useEffect(() => {
+    function onRemoteWorkspace(event) {
+      if (event.key !== LOCAL_STORAGE_KEY || !event.newValue) return
+      const incoming = parseStoredWorkspace(event.newValue)
+      if (!incoming) return
+      const snapshot = JSON.stringify(incoming)
+      setWorkspace(current => {
+        if (JSON.stringify(current) === snapshot) return current
+        lastRemoteSnapshot.current = snapshot
+        return incoming
+      })
+    }
+    window.addEventListener('storage', onRemoteWorkspace)
+    return () => window.removeEventListener('storage', onRemoteWorkspace)
+  }, [])
 
   const setTemplates = useCallback((templatesOrUpdater) => {
     setWorkspace((current) => ({

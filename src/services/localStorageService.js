@@ -108,6 +108,18 @@ export function loadLocalWorkspace() {
   }
 }
 
+// Parse an incoming storage event without overwriting an existing note.
+export function parseStoredWorkspace(rawValue) {
+  if (!rawValue) return null
+  try {
+    const parsed = JSON.parse(rawValue)
+    if (parsed?.schemaVersion !== LOCAL_SCHEMA_VERSION) return null
+    return normalizeState(parsed.data)
+  } catch {
+    return null
+  }
+}
+
 export function saveLocalWorkspace(data) {
   if (typeof window === 'undefined') return false
 

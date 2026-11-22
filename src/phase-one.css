@@ -1,0 +1,142 @@
+
+/* Phase 1: keep the existing dashboard, but make Focus / Mini obvious. */
+.quick-access-links .quick-access-focus {
+  display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 11px;
+  border:1px solid #84a8e0;border-radius:9px;background:#eaf2ff;color:#174b98;
+  font-size:11px;font-weight:800;text-decoration:none;
+}
+.quick-access-links .quick-access-mini {
+  display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:0 12px;
+  border:1px solid #174891;border-radius:9px;
+  background:linear-gradient(135deg,#286ed0,#17449c);color:#fff;
+  box-shadow:0 3px 9px rgb(28 87 190 / .23);font-weight:800;font-size:12px;
+}
+.quick-access-links .quick-access-mini:hover,
+.quick-access-links .quick-access-mini:focus-visible {background:#17449c;color:#fff;}
+.quick-access-links .quick-access-mini-page {
+  border:1px dashed #a7c0e1;background:#fff;color:#315985;
+}
+.section-maximize--notepad:not(.section-maximize--inline) {
+  display:inline-flex;width:auto;min-height:33px;align-items:center;gap:6px;padding:0 11px;
+  border-color:#356bc5;background:#e8f0ff;color:#1b529f;
+  font-size:11px;font-weight:800;white-space:nowrap;
+}
+/* Focus Notepad: tools and speech capture are collapsed unless requested. */
+.focus-workspace {display:grid;min-width:0;gap:11px;}
+.focus-workspace__helpers {display:flex;align-items:flex-start;flex-wrap:wrap;gap:9px;}
+.focus-workspace__helper {flex:1 1 230px;min-width:0;}
+.focus-workspace__helper,.focus-workspace__capture {
+  overflow:hidden;border:1px solid #cbd9ed;border-radius:10px;background:#fff;
+}
+.focus-workspace__helper>summary,.focus-workspace__capture>summary {
+  display:flex;justify-content:space-between;gap:10px;align-items:center;
+  min-height:40px;padding:10px 14px;cursor:pointer;color:#244c86;
+  font-size:12px;font-weight:800;
+}
+.focus-workspace__helper>summary span,.focus-workspace__capture>summary span {
+  color:#71819a;font-size:10px;font-weight:500;
+}
+.focus-workspace__helper[open]>summary,.focus-workspace__capture[open]>summary {
+  border-bottom:1px solid #e0e8f4;background:#f6f9ff;
+}
+.focus-workspace__helper>.panel,.focus-workspace__capture>.panel {
+  max-height:none;width:100%;border:0;box-shadow:none;border-radius:0;
+}
+.focus-workspace>.notes-workspace {min-height:max(500px,calc(100vh - 270px));}
+.focus-workspace .notes-workspace .note-editor {min-height:46vh;}
+.focus-workspace__capture .audio-capture textarea {min-height:110px;}
+/* Mini editor comes before all optional tools; an icon rail opens drawers. */
+.docutool-mini__header .docutool-mini__identity {display:grid;}
+.docutool-mini__header .docutool-mini__header-actions {
+  display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:6px;
+}
+.docutool-mini__header-actions>a,.docutool-mini__header-actions .docutool-mini__float {
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  min-height:29px;padding:5px 8px;border:1px solid #a8c1e7;border-radius:7px;
+  background:#f3f7ff;color:#204f91;font-size:11px;font-weight:750;
+  text-decoration:none;cursor:pointer;
+}
+.docutool-mini__header-actions .docutool-mini__float {
+  border-color:#235ab2;background:#235ab2;color:white;
+}
+.docutool-mini__layout {
+  position:relative;display:grid;grid-template-columns:48px minmax(0,1fr);
+  gap:8px;min-width:0;
+}
+.docutool-mini__rail {
+  position:sticky;z-index:3;top:0;display:grid;align-self:start;
+  gap:7px;padding:6px 3px;border:1px solid #cbd9ed;
+  border-radius:9px;background:#fff;
+}
+.docutool-mini__rail button {
+  display:grid;justify-items:center;gap:3px;min-height:53px;
+  padding:6px 2px;border:1px solid transparent;border-radius:7px;
+  background:transparent;color:#345b8e;cursor:pointer;
+}
+.docutool-mini__rail button span {font-size:9px;font-weight:750;}
+.docutool-mini__rail button small {font-size:9px;}
+.docutool-mini__rail button:hover,
+.docutool-mini__rail button.is-active,
+.docutool-mini__rail button:focus-visible {
+  border-color:#a8c6ee;background:#e9f2ff;color:#144ba0;
+}
+.docutool-mini__primary {min-width:0;}
+.docutool-mini__primary>.docutool-mini__notepad {margin-bottom:8px;}
+.docutool-mini__primary .note-editor {min-height:260px;}
+.docutool-mini__primary .note-editor-shell {margin:8px 8px 5px;}
+.docutool-mini__primary .note-actions {padding-bottom:9px;}
+.docutool-mini__primary .note-tools {padding-top:5px;}
+.docutool-mini__primary .note-tab-controls {padding:0 8px;}
+.docutool-mini__drawer {
+  position:absolute;z-index:12;top:0;right:0;left:56px;
+  max-height:min(72vh,650px);overflow-y:auto;padding:8px;
+  border:1px solid #97b5df;border-radius:10px;
+  background:#fff;box-shadow:0 10px 30px rgb(19 55 104 / .20);
+}
+.docutool-mini__drawer-header {
+  position:sticky;z-index:2;top:-8px;display:flex;align-items:center;
+  justify-content:space-between;padding:5px 3px 9px;
+  background:#fff;color:#17467c;font-size:12px;
+}
+.docutool-mini__drawer-header button {
+  display:grid;width:27px;height:27px;place-items:center;
+  border:1px solid #cbd9ed;border-radius:6px;
+  background:#f8fbff;color:#38577e;cursor:pointer;
+}
+.docutool-mini__drawer>.docutool-mini__section {
+  margin:0;padding:4px;border:0;box-shadow:none;
+}
+.docutool-mini__capture-details {
+  overflow:hidden;border:1px solid #d5e0ef;border-radius:9px;background:#fff;
+}
+.docutool-mini__capture-details>summary {
+  display:flex;align-items:center;gap:7px;padding:11px 10px;
+  color:#244a7c;cursor:pointer;font-size:11px;font-weight:800;
+}
+.docutool-mini__capture-details>summary small {
+  margin-left:auto;color:#6e7e96;font-size:9px;font-weight:500;
+}
+.docutool-mini__capture-details[open]>summary {
+  border-bottom:1px solid #d5e0ef;background:#f6f9ff;
+}
+.docutool-mini__capture-content {padding:10px;}
+.docutool-mini__capture-content .docutool-mini__captured {min-height:95px;}
+.docutool-mini--page {min-height:100vh;height:100dvh;}
+.docutool-mini--page .docutool-mini__scroll {
+  width:min(100%,950px);margin:0 auto;padding:15px;
+}
+.docutool-mini--page .docutool-mini__layout {
+  grid-template-columns:58px minmax(0,1fr);gap:12px;
+}
+.docutool-mini--page .docutool-mini__rail button {min-height:62px;}
+.docutool-mini--page .docutool-mini__drawer {left:70px;}
+.docutool-mini--page .docutool-mini__primary .note-editor {
+  min-height:46vh;height:53vh;max-height:62vh;
+}
+@media(max-width:600px) {
+  .quick-access-links .quick-access-focus {padding:0 8px;}
+  .quick-access-links .quick-access-mini {padding:0 9px;}
+  .docutool-mini--page .docutool-mini__scroll {padding:9px;}
+  .docutool-mini__header {flex-wrap:wrap;}
+  .focus-workspace__helpers {display:grid;}
+}

@@ -27,12 +27,17 @@ export const SECTION_META = {
 export function SectionMaximizeButton({ slug, label, inline = false }) {
   return (
     <a
-      className={inline ? 'section-maximize section-maximize--inline' : 'section-maximize'}
+      className={[
+        'section-maximize',
+        inline ? 'section-maximize--inline' : '',
+        slug === 'notepad' ? 'section-maximize--notepad' : '',
+      ].filter(Boolean).join(' ')}
       href={`/${slug}`}
-      aria-label={`Open ${label} full page`}
-      title={`Open ${label} full page`}
+      aria-label={slug === 'notepad' ? 'Open Focus Notepad' : `Open ${label} full page`}
+      title={slug === 'notepad' ? 'Open Focus Notepad' : `Open ${label} full page`}
     >
       <Maximize2 size={15} aria-hidden="true" />
+      {slug === 'notepad' && <span>Focus Notepad</span>}
     </a>
   )
 }
