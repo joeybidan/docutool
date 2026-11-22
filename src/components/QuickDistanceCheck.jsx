@@ -1,0 +1,111 @@
+import { useEffect, useRef, useState } from 'react'
+import { ChevronDown, ChevronRight, ExternalLink, MapPin, Route } from 'lucide-react'
+import { calculateZipDistance, googleMapsDirectionsUrl } from '../utils/distanceCheck.js'
+
+// Designed to take a single compact line when collapsed in floating Mini.
+// ZIP-only lookup: never collect, upload or persist individual street addresses.
+export function QuickDistanceCheck({ compact = false }) {
+  const [expanded, setExpanded] = useState(!compact)
+  const [caregiverArea, setCaregiverArea] = useState('')
+  const [clientArea, setClientArea] = useState('')
+  const [distance, setDistance] = useState(null)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const abortRef = useRef(null)
+
+  useEffect(() => () => { abortRef.current?.abort() }, [])
+
+  function updateArea(setter, value) {
+    abortRef.current?.abort()
+    setLoading(false)
+    setError('')
+    setDistance(null)
+    setter(value)
+  }
+
+  async function check(event) {
+    event.preventDefault()
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+    setLoading(true)
+    setError('')
+    setDistance(null)
+    try {
+      const result = await calculateZipDistance(caregiverArea, clientArea, {
+        signal: controller.signal,
+      })
+      if (!controller.signal.aborted) setDistance(result)
+    } catch (reason) {
+      if (!controller.signal.aborted) {
+        setError(reason?.message || 'Could not check these areas right now.')
+      }
+    } finally {
+      if (!controller.signal.aborted) setLoading(false)
+    }
+  }
+
+  const mapsUrl = distance
+    ? googleMapsDirectionsUrl(distance.caregiver.zip, distance.client.zip)
+    : ''
+
+  return (
+    <section className="distance-check" aria-label="Quick caregiver and client distance check">
+      <button type="button" className="distance-check__toggle"
+        aria-expanded={expanded} onClick={() => setExpanded(open => !open)}>
+        <span className="distance-check__identity">
+          <Route size={16} aria-hidden="true" />
+          <strong>Quick Distance Check</strong>
+          <small>Caregiver ↔ client ZIP areas</small>
+        </span>
+        <span className="distance-check__expand">
+          {expanded ? 'Hide' : 'Expand'}
+          {expanded ? <ChevronDown size={15} aria-hidden="true" /> :
+            <ChevronRight size={15} aria-hidden="true" />}
+        </span>
+      </button>
+      {expanded && (
+        <div className="distance-check__content">
+          <form className="distance-check__form" onSubmit={check}>
+            <label>
+              <span>Caregiver area</span>
+              <input value={caregiverArea} onChange={event => updateArea(setCaregiverArea, event.target.value)}
+                placeholder="City, ST 12345 or ZIP" aria-label="Caregiver city state and ZIP"
+                maxLength={70} autoComplete="off" spellCheck="false" />
+            </label>
+            <label>
+              <span>Client area</span>
+              <input value={clientArea} onChange={event => updateArea(setClientArea, event.target.value)}
+                placeholder="City, ST 12345 or ZIP" aria-label="Client city state and ZIP"
+                maxLength={70} autoComplete="off" spellCheck="false" />
+            </label>
+            <button type="submit" className="distance-check__submit" disabled={loading}>
+              <MapPin size={14} aria-hidden="true" />
+              {loading ? 'Checking…' : 'Check distance'}
+            </button>
+          </form>
+
+          {error && <p className="distance-check__error" role="alert">{error}</p>}
+          {distance && (
+            <div className="distance-check__result" role="status">
+              <div>
+                <strong>{distance.miles.toLocaleString('en-US')} miles</strong>
+                <span>≈ {distance.kilometers.toLocaleString('en-US')} km · straight line between ZIP centers</span>
+                <small>{distance.caregiver.city}, {distance.caregiver.state} {distance.caregiver.zip}
+                  {' → '}{distance.client.city}, {distance.client.state} {distance.client.zip}</small>
+              </div>
+              <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
+                aria-label="Open driving directions in Google Maps, new tab">
+                Driving route <ExternalLink size={14} aria-hidden="true" />
+              </a>
+            </div>
+          )}
+          <p className="distance-check__hint">
+            Approximate ZIP-center distance, not driving mileage or ETA. Use Google Maps for roads and travel time.
+            No street addresses or saved location history.
+          </p>
+        </div>
+      )}
+    </section>
+  )
+}

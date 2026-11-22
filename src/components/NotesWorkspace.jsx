@@ -5,6 +5,7 @@ import { NoteEditor, FormatControls } from './NoteEditor.jsx'
 import { NoteTabs } from './NoteTabs.jsx'
 import { QuickCallWrapUp } from './QuickCallWrapUp.jsx'
 import { FavoriteTemplates } from './FavoriteTemplates.jsx'
+import { QuickDistanceCheck } from './QuickDistanceCheck.jsx'
 import { ReviewCopyPanel } from './ReviewCopyPanel.jsx'
 import { Button } from './ui/Button.jsx'
 
@@ -12,6 +13,7 @@ export function NotesWorkspace({
   activeIndex,
   names, html, onAdd, onRename, onDelete, saveError,
   templates, favoriteTemplateIds, onInsertFavorite,
+  compactDistance = false,
   note,
   onActiveIndexChange,
   onNoteChange,
@@ -25,6 +27,7 @@ export function NotesWorkspace({
   const editorRef = useRef(null)
   return (
     <section className="panel notes-workspace" aria-label="Advanced notepad">
+      <QuickDistanceCheck compact={compactDistance} />
       <NoteTools note={note} html={html} name={names[activeIndex]} />
       <NoteTabs activeIndex={activeIndex} onChange={onActiveIndexChange} names={names}
         onAdd={onAdd} onRename={onRename} onDelete={onDelete} note={note} />

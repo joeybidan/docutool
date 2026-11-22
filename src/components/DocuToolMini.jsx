@@ -159,6 +159,7 @@ export function DocuToolMini({
           <NotesWorkspace activeIndex={activeNoteIndex} note={activeNote} html={noteHtml[activeNoteIndex]}
             names={noteNames} onAdd={onAdd} onRename={onRename} onDelete={onDelete} saveError={saveError}
             templates={templates} favoriteTemplateIds={favoriteTemplateIds} onInsertFavorite={onInsertFavorite}
+            compactDistance
             onActiveIndexChange={onActiveNoteIndexChange} onNoteChange={onNoteChange}
             onGenerate={handleGenerate} onCopy={handleCopy} onClear={onClearNote}
             onAddWrapUp={onAddWrapUp}
