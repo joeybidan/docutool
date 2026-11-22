@@ -9,6 +9,7 @@ import {
   Maximize2,
   Mic,
   Search,
+  Star,
   Square,
   TextCursorInput,
   X,
@@ -20,8 +21,11 @@ export function DocuToolMini({
   templates,
   selectedIds,
   onToggle,
+  favoriteTemplateIds,
+  onToggleFavorite,
+  onInsertFavorite,
   notes,
-  noteNames, noteHtml, onAdd, onRename, saveError,
+  noteNames, noteHtml, onAdd, onRename, onDelete, saveError,
   activeNoteIndex,
   onActiveNoteIndexChange,
   onNoteChange,
@@ -153,7 +157,8 @@ export function DocuToolMini({
           </div>
 
           <NotesWorkspace activeIndex={activeNoteIndex} note={activeNote} html={noteHtml[activeNoteIndex]}
-            names={noteNames} onAdd={onAdd} onRename={onRename} saveError={saveError}
+            names={noteNames} onAdd={onAdd} onRename={onRename} onDelete={onDelete} saveError={saveError}
+            templates={templates} favoriteTemplateIds={favoriteTemplateIds} onInsertFavorite={onInsertFavorite}
             onActiveIndexChange={onActiveNoteIndexChange} onNoteChange={onNoteChange}
             onGenerate={handleGenerate} onCopy={handleCopy} onClear={onClearNote}
             onAddWrapUp={onAddWrapUp}
@@ -262,19 +267,25 @@ export function DocuToolMini({
                     </button>
                   </h2>
                   <div id={`mini-template-phrases-${group.id}`} hidden={!expanded}>
-                    {group.templates.map((template) => (
-                      <label className="docutool-mini__option" key={template.id}>
-                        <input
-                          type="checkbox"
-                          checked={selectedIds.has(template.id)}
-                          onChange={() => {
-                            onToggle(template.id)
-                            setStatus('')
-                          }}
-                        />
-                        <span>{template.text}</span>
-                      </label>
-                    ))}
+                    {group.templates.map((template) => {
+                      const favorite = favoriteTemplateIds.includes(template.id)
+                      const favoritesFull = favoriteTemplateIds.length >= 5
+                      return <div className="docutool-mini__option docutool-mini__option--favorite" key={template.id}>
+                        <label className="favorite-template-option__label">
+                          <input type="checkbox" checked={selectedIds.has(template.id)}
+                            onChange={() => { onToggle(template.id); setStatus('') }} />
+                          <span>{template.text}</span>
+                        </label>
+                        <button type="button" className="favorite-template-option__star"
+                          aria-label={(favorite ? 'Remove from Favorite 5: ' : 'Add to Favorite 5: ') + template.text}
+                          aria-pressed={favorite}
+                          title={favorite ? 'Remove from Favorite 5' : favoritesFull ? 'Unstar a favorite first' : 'Add to Favorite 5'}
+                          disabled={!favorite && favoritesFull}
+                          onClick={() => onToggleFavorite(template.id)}>
+                          <Star size={15} fill={favorite ? 'currentColor' : 'none'} aria-hidden="true" />
+                        </button>
+                      </div>
+                    })}
                   </div>
                 </section>
               )

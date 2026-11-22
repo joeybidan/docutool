@@ -37,12 +37,14 @@ import './section-pages.css'
 import './phase-one.css'
 import './phase-two.css'
 import './phase-three.css'
+import './phase-four.css'
 
 function App() {
   const {
     templates,
     notes,
-    noteNames, noteHtml, addNote, renameNote, saveError,
+    noteNames, noteHtml, addNote, renameNote, deleteNote, saveError,
+    favoriteTemplateIds, toggleFavoriteTemplate,
     activeNoteIndex,
     setTemplates,
     updateNote,
@@ -99,6 +101,12 @@ function App() {
     return message
   }, [activeNote, noteHtml, noteNames, activeNoteIndex, notify])
 
+  const handleInsertFavorite = useCallback((template) => {
+    if (!templates.some(item => item.id === template?.id)) return
+    updateNote(activeNoteIndex, current => appendTextBlock(current, template.text))
+    notify('Favorite phrase added to ' + noteNames[activeNoteIndex] + '.')
+  }, [activeNoteIndex, noteNames, notify, templates, updateNote])
+
   const handleAddWrapUp = useCallback((draft) => {
     const block = formatCallWrapUpBlock(draft)
     updateNote(activeNoteIndex, currentText => appendTextBlock(currentText, block))
@@ -129,8 +137,11 @@ function App() {
     templates,
     selectedIds,
     onToggle: handleTemplateToggle,
+    favoriteTemplateIds,
+    onToggleFavorite: toggleFavoriteTemplate,
+    onInsertFavorite: handleInsertFavorite,
     notes,
-    noteNames, noteHtml, onAdd: addNote, onRename: renameNote, saveError,
+    noteNames, noteHtml, onAdd: addNote, onRename: renameNote, onDelete: deleteNote, saveError,
     activeNoteIndex,
     onActiveNoteIndexChange: setActiveNoteIndex,
     onNoteChange: (value, html) => updateNote(activeNoteIndex, value, html),
@@ -212,6 +223,8 @@ function App() {
             selectedIds={selectedIds}
             onToggle={handleTemplateToggle}
             onTemplatesChange={handleTemplatesChange}
+            favoriteTemplateIds={favoriteTemplateIds}
+            onToggleFavorite={toggleFavoriteTemplate}
             onNotify={notify}
           />
         )
@@ -244,6 +257,10 @@ function App() {
             html={noteHtml[activeNoteIndex]}
             onAdd={addNote}
             onRename={renameNote}
+            onDelete={deleteNote}
+            templates={templates}
+            favoriteTemplateIds={favoriteTemplateIds}
+            onInsertFavorite={handleInsertFavorite}
             saveError={saveError}
             onActiveIndexChange={setActiveNoteIndex}
             onNoteChange={(value, html) => updateNote(activeNoteIndex, value, html)}

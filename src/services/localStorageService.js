@@ -1,5 +1,6 @@
 import { textToHtml } from '../utils/richText.js'
 import { DEFAULT_TEMPLATES, TEMPLATE_GROUPS } from '../constants/defaults.js'
+import { normalizeFavoriteIds } from '../utils/workspaceActions.js'
 
 export const LOCAL_STORAGE_KEY = 'docutool:workspace:v3'
 const LEGACY_KEY = 'docutool:workspace:v1'
@@ -13,6 +14,7 @@ const createDefaultState = () => ({
   noteNames: ['Note 1', 'Note 2', 'Note 3', 'Note 4', 'Note 5'],
   noteHtml: ['', '', '', '', ''],
   activeNoteIndex: 0,
+  favoriteTemplateIds: [],
 })
 
 function inferTemplateGroup(text = '') {
@@ -48,16 +50,19 @@ const normalizeNotes = (data) =>
     : createDefaultState().notes
 
 const normalizeState = (data) => {
+  const templates = normalizeTemplates(data?.templates)
+  const notes = normalizeNotes(data)
   const activeNoteIndex = Number.isInteger(data?.activeNoteIndex)
-    ? Math.min(normalizeNotes(data).length - 1, Math.max(0, data.activeNoteIndex))
+    ? Math.min(notes.length - 1, Math.max(0, data.activeNoteIndex))
     : 0
 
   return {
-    templates: normalizeTemplates(data?.templates),
-    notes: normalizeNotes(data),
-    noteNames: normalizeNotes(data).map((_, i) => typeof data?.noteNames?.[i] === 'string' && data.noteNames[i].trim() ? data.noteNames[i] : `Note ${i + 1}`),
-    noteHtml: normalizeNotes(data).map((text, i) => typeof data?.noteHtml?.[i] === 'string' ? data.noteHtml[i] : textToHtml(text)),
+    templates,
+    notes,
+    noteNames: notes.map((_, i) => typeof data?.noteNames?.[i] === 'string' && data.noteNames[i].trim() ? data.noteNames[i] : `Note ${i + 1}`),
+    noteHtml: notes.map((text, i) => typeof data?.noteHtml?.[i] === 'string' ? data.noteHtml[i] : textToHtml(text)),
     activeNoteIndex,
+    favoriteTemplateIds: normalizeFavoriteIds(data?.favoriteTemplateIds, templates),
   }
 }
 

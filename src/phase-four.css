@@ -1,0 +1,76 @@
+/* Phase 4 - five pinned phrases and safe tab deletion. */
+.favorite-templates {
+  min-width:0;box-sizing:border-box;margin:5px 12px 8px;
+  border:1px solid #d4e1f1;border-radius:9px;background:#fbfcff;color:#234775;
+}
+.favorite-templates__toggle {
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;width:100%;min-height:34px;padding:7px 10px;
+  background:transparent;border:0;text-align:left;color:#27539b;cursor:pointer;
+}
+.favorite-templates__title,.favorite-templates__hint {display:inline-flex;align-items:center;gap:6px;}
+.favorite-templates__title strong {font-size:11px;}
+.favorite-templates__title small {padding:2px 5px;border-radius:99px;background:#e6efff;color:#2352a1;font-size:10px;}
+.favorite-templates__hint {font-size:10px;color:#667f9e;}
+.favorite-templates__content {padding:0 9px 9px;}
+.favorite-templates__content p {margin:3px 0 0;font-size:10px;line-height:1.45;color:#57728e;}
+.favorite-templates__chips {display:flex;flex-wrap:wrap;gap:5px;}
+.favorite-templates__chips>button {
+  display:flex;align-items:center;gap:5px;min-width:0;max-width:240px;
+  padding:6px 8px;border:1px solid #b9d2f0;border-radius:7px;
+  background:#fff;color:#244a81;font-size:10.5px;line-height:1.25;cursor:pointer;
+}
+.favorite-templates__chips>button:hover,.favorite-templates__chips>button:focus-visible {
+  background:#eaf3ff;border-color:#6598dd;
+}
+.favorite-templates__number {display:grid;place-items:center;flex:0 0 auto;
+  width:17px;height:17px;border-radius:99px;background:#dceafc;color:#1d579c;font-weight:850;}
+.favorite-templates__text {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.template-option--favorite,.docutool-mini__option--favorite {
+  display:grid;grid-template-columns:minmax(0,1fr) 30px;gap:5px;align-items:center;
+}
+.favorite-template-option__label {
+  display:grid;grid-template-columns:17px minmax(0,1fr);gap:6px;align-items:start;
+  min-width:0;cursor:pointer;
+}
+.favorite-template-option__label input {margin-top:2px;}
+.favorite-template-option__star {
+  display:grid;place-items:center;width:27px;height:27px;padding:0;
+  border:1px solid #d5dfee;border-radius:7px;background:#fff;
+  color:#8393aa;cursor:pointer;
+}
+.favorite-template-option__star[aria-pressed="true"] {
+  color:#b07700;background:#fff4d9;border-color:#e8cb85;
+}
+.favorite-template-option__star:disabled {opacity:.35;cursor:not-allowed;}
+.favorite-template-option__star:hover:not(:disabled),
+.favorite-template-option__star:focus-visible {border-color:#b07700;color:#9b6800;}
+.note-manage-actions .note-tab-delete {
+  display:inline-flex;align-items:center;gap:5px;color:#8b3340;background:#fff7f8;border-color:#e6c1c8;
+}
+.note-manage-actions .note-tab-delete:disabled {opacity:.45;cursor:not-allowed;}
+.note-tab-delete-confirm {
+  margin:0 0 8px;padding:10px;display:flex;justify-content:space-between;
+  align-items:center;gap:8px;flex-wrap:wrap;
+  border:1px solid #f0bcb8;border-radius:8px;background:#fff9f7;color:#813637;
+}
+.note-tab-delete-confirm strong {font-size:11px;}
+.note-tab-delete-confirm p {margin:4px 0 0;font-size:10px;line-height:1.4;}
+.note-tab-delete-confirm__actions {display:flex;gap:6px;}
+.note-tab-delete-confirm__actions button {
+  padding:7px 9px;border-radius:6px;border:1px solid #d9b5b5;
+  cursor:pointer;font-weight:750;font-size:10px;background:#fff;color:#734347;
+}
+.note-tab-delete-confirm__actions .note-tab-delete-confirm__yes {
+  color:#fff;background:#ad3747;border-color:#ad3747;
+}
+.docutool-mini .favorite-templates {margin:5px 7px 7px;}
+.docutool-mini .favorite-templates__toggle {padding:6px 8px;}
+.docutool-mini .favorite-templates__hint {font-size:9px;}
+.docutool-mini .favorite-templates__chips>button {max-width:100%;}
+.docutool-mini .note-tab-delete-confirm {padding:8px;}
+.docutool-mini .note-tab-delete-confirm__actions {width:100%;justify-content:flex-end;}
+@media (max-width:440px) {
+  .favorite-templates__hint {font-size:9px;}
+  .favorite-templates__chips>button {max-width:100%;}
+}

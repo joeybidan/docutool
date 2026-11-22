@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
-import { CheckSquare2, ChevronDown, ChevronRight, Pencil } from 'lucide-react'
+import { CheckSquare2, ChevronDown, ChevronRight, Pencil, Star } from 'lucide-react'
 import { TEMPLATE_GROUPS } from '../constants/defaults.js'
 import { Button } from './ui/Button.jsx'
 import { TemplateEditor } from './TemplateEditor.jsx'
 
-export function TemplatePanel({ templates, selectedIds, onToggle, onTemplatesChange, onNotify }) {
+export function TemplatePanel({ templates, selectedIds, onToggle, onTemplatesChange, onNotify, favoriteTemplateIds, onToggleFavorite }) {
   const [isEditing, setIsEditing] = useState(false)
   // Open the first workflow only; each group can be expanded independently.
   // Collapsing hides phrases without modifying any checked selections.
@@ -69,16 +69,26 @@ export function TemplatePanel({ templates, selectedIds, onToggle, onTemplatesCha
                     </button>
                   </h3>
                   <div id={`template-group-phrases-${group.id}`} className="template-group__options" hidden={!expanded}>
-                    {group.templates.map((template) => (
-                      <label className="template-option" key={template.id}>
-                        <input
-                          type="checkbox"
-                          checked={selectedIds.has(template.id)}
-                          onChange={() => onToggle(template.id)}
-                        />
-                        <span>{template.text}</span>
-                      </label>
-                    ))}
+                    {group.templates.map((template) => {
+                      const favorite = favoriteTemplateIds.includes(template.id)
+                      const favoritesFull = favoriteTemplateIds.length >= 5
+                      return <div className="template-option template-option--favorite" key={template.id}>
+                        <label className="favorite-template-option__label">
+                          <input type="checkbox" checked={selectedIds.has(template.id)}
+                            onChange={() => onToggle(template.id)} />
+                          <span>{template.text}</span>
+                        </label>
+                        <button type="button"
+                          className="favorite-template-option__star"
+                          aria-label={(favorite ? 'Remove from Favorite 5: ' : 'Add to Favorite 5: ') + template.text}
+                          aria-pressed={favorite}
+                          title={favorite ? 'Remove from Favorite 5' : favoritesFull ? 'Unstar one favorite to add another' : 'Add to Favorite 5'}
+                          disabled={!favorite && favoritesFull}
+                          onClick={() => onToggleFavorite(template.id)}>
+                          <Star size={15} fill={favorite ? 'currentColor' : 'none'} aria-hidden="true" />
+                        </button>
+                      </div>
+                    })}
                   </div>
                 </section>
               )

@@ -6,6 +6,7 @@ import {
   saveLocalWorkspace,
 } from '../services/localStorageService.js'
 import { textToHtml } from '../utils/richText.js'
+import { deleteWorkspaceNote, normalizeFavoriteIds, toggleFavoriteId } from '../utils/workspaceActions.js'
 
 export function useLocalWorkspace() {
   const [workspace, setWorkspace] = useState(loadLocalWorkspace)
@@ -39,12 +40,21 @@ export function useLocalWorkspace() {
   }, [])
 
   const setTemplates = useCallback((templatesOrUpdater) => {
-    setWorkspace((current) => ({
+    setWorkspace((current) => {
+      const templates = typeof templatesOrUpdater === 'function'
+        ? templatesOrUpdater(current.templates) : templatesOrUpdater
+      return {
+        ...current,
+        templates,
+        favoriteTemplateIds: normalizeFavoriteIds(current.favoriteTemplateIds, templates),
+      }
+    })
+  }, [])
+
+  const toggleFavoriteTemplate = useCallback((id) => {
+    setWorkspace(current => ({
       ...current,
-      templates:
-        typeof templatesOrUpdater === 'function'
-          ? templatesOrUpdater(current.templates)
-          : templatesOrUpdater,
+      favoriteTemplateIds: toggleFavoriteId(current.favoriteTemplateIds, id, current.templates),
     }))
   }, [])
 
@@ -70,6 +80,10 @@ export function useLocalWorkspace() {
     setWorkspace(current => ({ ...current, notes: [...current.notes, ''], noteHtml: [...current.noteHtml, ''],
       noteNames: [...current.noteNames, `Note ${current.notes.length + 1}`], activeNoteIndex: current.notes.length }))
   }, [])
+  const deleteNote = useCallback((index) => {
+    setWorkspace(current => deleteWorkspaceNote(current, index))
+  }, [])
+
   const renameNote = useCallback((index, name) => {
     if (!name.trim()) return
     setWorkspace(current => ({ ...current, noteNames: current.noteNames.map((old, i) => i === index ? name.trim() : old) }))
@@ -82,9 +96,11 @@ export function useLocalWorkspace() {
   return {
     ...workspace,
     setTemplates,
+    toggleFavoriteTemplate,
     updateNote,
     setActiveNoteIndex,
     addNote,
+    deleteNote,
     renameNote,
     saveError,
   }

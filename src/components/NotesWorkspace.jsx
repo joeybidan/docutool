@@ -4,12 +4,14 @@ import { Eraser, ListX, Sparkles } from 'lucide-react'
 import { NoteEditor, FormatControls } from './NoteEditor.jsx'
 import { NoteTabs } from './NoteTabs.jsx'
 import { QuickCallWrapUp } from './QuickCallWrapUp.jsx'
+import { FavoriteTemplates } from './FavoriteTemplates.jsx'
 import { ReviewCopyPanel } from './ReviewCopyPanel.jsx'
 import { Button } from './ui/Button.jsx'
 
 export function NotesWorkspace({
   activeIndex,
-  names, html, onAdd, onRename, saveError,
+  names, html, onAdd, onRename, onDelete, saveError,
+  templates, favoriteTemplateIds, onInsertFavorite,
   note,
   onActiveIndexChange,
   onNoteChange,
@@ -24,7 +26,10 @@ export function NotesWorkspace({
   return (
     <section className="panel notes-workspace" aria-label="Advanced notepad">
       <NoteTools note={note} html={html} name={names[activeIndex]} />
-      <NoteTabs activeIndex={activeIndex} onChange={onActiveIndexChange} names={names} onAdd={onAdd} onRename={onRename} />
+      <NoteTabs activeIndex={activeIndex} onChange={onActiveIndexChange} names={names}
+        onAdd={onAdd} onRename={onRename} onDelete={onDelete} note={note} />
+      <FavoriteTemplates templates={templates} favoriteTemplateIds={favoriteTemplateIds}
+        noteName={names[activeIndex]} onInsert={onInsertFavorite} />
       <QuickCallWrapUp activeIndex={activeIndex} noteName={names[activeIndex]} onAdd={onAddWrapUp} />
       <NoteEditor editorRef={editorRef} html={html} activeIndex={activeIndex} value={note} onChange={onNoteChange} />
       <div className="note-actions" aria-label="Notepad actions">
