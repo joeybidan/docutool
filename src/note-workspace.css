@@ -27,7 +27,7 @@
 .notes-workspace {
   min-height:0;
   height:auto;
-  grid-template-rows:auto auto auto auto;
+  grid-template-rows:auto auto auto auto auto;
   align-content:start;
   overflow:visible;
 }

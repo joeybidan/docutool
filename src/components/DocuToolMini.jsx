@@ -26,6 +26,7 @@ export function DocuToolMini({
   onActiveNoteIndexChange,
   onNoteChange,
   onGenerate,
+  onAddWrapUp,
   onCopy,
   onClearNote,
   onUncheck,
@@ -154,6 +155,7 @@ export function DocuToolMini({
             names={noteNames} onAdd={onAdd} onRename={onRename} saveError={saveError}
             onActiveIndexChange={onActiveNoteIndexChange} onNoteChange={onNoteChange}
             onGenerate={handleGenerate} onCopy={handleCopy} onClear={onClearNote}
+            onAddWrapUp={onAddWrapUp}
             onUncheck={handleUncheck} selectedCount={selectedCount} />
 
           <p className={`docutool-mini__status docutool-mini__status--${statusType}`} aria-live="polite">

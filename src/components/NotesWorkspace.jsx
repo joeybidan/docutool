@@ -3,6 +3,7 @@ import { NoteTools } from './NoteTools.jsx'
 import { Copy, Eraser, ListX, Sparkles } from 'lucide-react'
 import { NoteEditor, FormatControls } from './NoteEditor.jsx'
 import { NoteTabs } from './NoteTabs.jsx'
+import { QuickCallWrapUp } from './QuickCallWrapUp.jsx'
 import { Button } from './ui/Button.jsx'
 
 export function NotesWorkspace({
@@ -16,12 +17,14 @@ export function NotesWorkspace({
   onClear,
   onUncheck,
   selectedCount,
+  onAddWrapUp,
 }) {
   const editorRef = useRef(null)
   return (
     <section className="panel notes-workspace" aria-label="Advanced notepad">
       <NoteTools note={note} html={html} name={names[activeIndex]} />
       <NoteTabs activeIndex={activeIndex} onChange={onActiveIndexChange} names={names} onAdd={onAdd} onRename={onRename} />
+      <QuickCallWrapUp activeIndex={activeIndex} noteName={names[activeIndex]} onAdd={onAddWrapUp} />
       <NoteEditor editorRef={editorRef} html={html} activeIndex={activeIndex} value={note} onChange={onNoteChange} />
       <div className="note-actions" aria-label="Notepad actions">
         <Button variant="primary" type="button" onClick={onGenerate} disabled={!selectedCount}>

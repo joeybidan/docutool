@@ -24,6 +24,7 @@ import { useDocuToolMini } from './hooks/useDocuToolMini.jsx'
 import { useLocalWorkspace } from './hooks/useLocalWorkspace.js'
 import { useSharedContent } from './hooks/useSharedContent.js'
 import { useSynchronizedAudioCapture } from './hooks/useSynchronizedAudioCapture.js'
+import { formatCallWrapUpBlock } from './utils/callWrapUp.js'
 import {
   appendTextBlock,
   copyToClipboard,
@@ -34,6 +35,7 @@ import './feature-updates.css'
 import './time-tools.css'
 import './section-pages.css'
 import './phase-one.css'
+import './phase-two.css'
 
 function App() {
   const {
@@ -96,6 +98,12 @@ function App() {
     return message
   }, [activeNote, noteHtml, noteNames, activeNoteIndex, notify])
 
+  const handleAddWrapUp = useCallback((draft) => {
+    const block = formatCallWrapUpBlock(draft)
+    updateNote(activeNoteIndex, currentText => appendTextBlock(currentText, block))
+    notify(`Call wrap-up added to ${noteNames[activeNoteIndex]}.`)
+  }, [activeNoteIndex, noteNames, notify, updateNote])
+
   const handleMiniClearNote = useCallback(() => {
     updateNote(activeNoteIndex, '')
     notify(`${noteNames[activeNoteIndex]} cleared.`)
@@ -126,6 +134,7 @@ function App() {
     onActiveNoteIndexChange: setActiveNoteIndex,
     onNoteChange: (value, html) => updateNote(activeNoteIndex, value, html),
     onGenerate: handleMiniGenerate,
+    onAddWrapUp: handleAddWrapUp,
     onCopy: handleMiniCopy,
     onClearNote: handleMiniClearNote,
     onUncheck: () => setSelectedIds(new Set()),
@@ -237,6 +246,7 @@ function App() {
             onActiveIndexChange={setActiveNoteIndex}
             onNoteChange={(value, html) => updateNote(activeNoteIndex, value, html)}
             onGenerate={handleGenerate}
+            onAddWrapUp={handleAddWrapUp}
             onCopy={handleCopy}
             onClear={handleClear}
             onUncheck={handleUncheck}
