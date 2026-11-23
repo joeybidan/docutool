@@ -110,7 +110,7 @@ export function DocuToolMini({
       aria-label="DocuTool Mini">
       <header className="docutool-mini__header">
         <div className="docutool-mini__identity">
-          <strong>DocuTool Mini</strong>
+          <strong>{mode === 'page' ? <a className="docutool-mini__brand-home" href="/" title="Return to DocuTool dashboard">DocuTool Mini</a> : 'DocuTool Mini'}</strong>
           <span>{mode === 'pip' ? 'Always-on-top notepad' : 'Your compact documentation workspace'}</span>
           <div className="docutool-mini__live-count" aria-label="Online DocuTool visitors">
             <VisitorCounter />

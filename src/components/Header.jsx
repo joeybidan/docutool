@@ -9,7 +9,7 @@ export function Header({ onOpenAdmin, onOpenMini, showVisitorCounter = true }) {
   return (
     <header className="app-header">
       <div className="brand-group">
-        <a className="brand" href="#workspace" aria-label="DocuTool home">
+        <a className="brand" href="/" aria-label="DocuTool home — return to dashboard" title="Return to DocuTool dashboard">
           Docu<span>Tool</span>
         </a>
         <HourlyQuote />

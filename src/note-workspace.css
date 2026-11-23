@@ -53,3 +53,55 @@
 .docutool-mini--page .notes-workspace .rich-note-editor {
   height:auto;min-height:clamp(220px,30vh,440px);max-height:none;
 }
+
+/* Editor sizing: auto-grow for ordinary notes, then scroll inside the editor.
+   Native drag-resize stays available, but long imported notes can no longer stretch the page forever. */
+.note-editor-size-controls {
+  display:flex;align-items:center;justify-content:flex-end;gap:6px;
+  padding:6px 9px;border-bottom:1px solid #dce7f4;background:#f7faff;
+}
+.note-editor-size-controls > span {margin-right:auto;font-size:10px;color:#617794;font-weight:650;}
+.note-editor-size-controls button {
+  padding:4px 8px;border:1px solid #bfd0e4;border-radius:6px;
+  background:#fff;color:#285081;font:inherit;font-size:11px;font-weight:650;
+  cursor:pointer;white-space:nowrap;
+}
+.note-editor-size-controls button[aria-pressed="true"] {
+  border-color:#2a65bc;background:#e9f2ff;color:#164e9b;
+}
+.note-editor-size-controls button:focus-visible {outline:2px solid #2a65bc;outline-offset:2px;}
+.docutool-mini__brand-home {color:inherit;text-decoration:none;}
+.docutool-mini__brand-home:hover,.docutool-mini__brand-home:focus-visible {
+  color:#215cb4;text-decoration:underline;text-underline-offset:3px;
+}
+.notes-workspace .note-editor-shell[data-note-size] .rich-note-editor {
+  height:auto;min-height:clamp(180px,24vh,260px);
+  max-height:clamp(300px,48vh,520px);
+  overflow-y:auto;resize:vertical;scrollbar-gutter:stable;
+}
+.focus-workspace .notes-workspace .note-editor-shell[data-note-size="normal"] .rich-note-editor {
+  min-height:clamp(220px,30vh,520px);
+  max-height:clamp(380px,60vh,680px);
+}
+.docutool-mini .notes-workspace .note-editor-shell[data-note-size="normal"] .rich-note-editor {
+  min-height:180px;max-height:clamp(240px,45vh,370px);
+}
+.docutool-mini--page .notes-workspace .note-editor-shell[data-note-size="normal"] .rich-note-editor {
+  min-height:clamp(220px,30vh,400px);
+  max-height:clamp(330px,56vh,580px);
+}
+.notes-workspace .note-editor-shell[data-note-size="expanded"] .rich-note-editor {
+  min-height:clamp(320px,55vh,600px);
+  max-height:clamp(460px,82vh,980px);
+}
+.docutool-mini .notes-workspace .note-editor-shell[data-note-size="expanded"] .rich-note-editor {
+  min-height:clamp(260px,46vh,470px);
+  max-height:clamp(340px,75vh,760px);
+}
+.notes-workspace .note-editor-shell[data-note-size="collapsed"] .rich-note-editor {
+  height:76px;min-height:76px;max-height:76px;
+  overflow-y:auto;resize:none;
+}
+.docutool-mini .note-editor-size-controls {gap:4px;padding:5px;}
+.docutool-mini .note-editor-size-controls > span {display:none;}
+.docutool-mini .note-editor-size-controls button {padding:4px 6px;font-size:10px;}

@@ -1,16 +1,28 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { sanitizeHtml, textToHtml } from '../utils/richText.js'
 
 export function NoteEditor({ activeIndex, value, html, onChange, editorRef }) {
   const localRef = useRef(null)
   const ref = editorRef || localRef
+  const [sizeMode, setSizeMode] = useState('normal')
+  function chooseSize(nextMode) {
+    // Native drag-resize may leave an inline height: reset it even if Normal is already selected.
+    if (ref.current) ref.current.style.height = ''
+    setSizeMode(nextMode)
+  }
   useLayoutEffect(() => {
     const node = ref.current
     const clean = sanitizeHtml(html ?? textToHtml(value), node.ownerDocument)
     if (sanitizeHtml(node.innerHTML, node.ownerDocument) !== clean) node.innerHTML = clean
   }, [activeIndex, value, html, ref])
   function publish(node) { onChange(node.innerText, sanitizeHtml(node.innerHTML, node.ownerDocument)) }
-  return <div className="note-editor-shell">
+  return <div className="note-editor-shell" data-note-size={sizeMode}>
+    <div className="note-editor-size-controls" role="group" aria-label="Notepad writing space size">
+      <span>Writing space</span>
+      <button type="button" aria-pressed={sizeMode === 'collapsed'} onClick={() => chooseSize('collapsed')}>Collapse</button>
+      <button type="button" aria-pressed={sizeMode === 'normal'} onClick={() => chooseSize('normal')}>Normal</button>
+      <button type="button" aria-pressed={sizeMode === 'expanded'} onClick={() => chooseSize('expanded')}>Expand</button>
+    </div>
     <div ref={ref} className="note-editor rich-note-editor" role="textbox" aria-label="Note content"
       aria-multiline="true" contentEditable suppressContentEditableWarning spellCheck="true"
       onInput={event => publish(event.currentTarget)}
