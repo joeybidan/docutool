@@ -222,7 +222,7 @@ function App() {
 
   const media = sharedContent.dashboardMedia || {}
 
-  const renderSection = (slug) => {
+  const renderSection = (slug, { staticGallery = false } = {}) => {
     switch (slug) {
       case 'notestemplates':
         return (
@@ -334,7 +334,7 @@ function App() {
       case 'carematch':
         return <CareMatchLauncher />
       case 'teamrecognition':
-        return <RecognitionStrip recognition={sharedContent.recognition} />
+        return <RecognitionStrip recognition={sharedContent.recognition} staticLayout={staticGallery} />
       case 'kudos':
         return (
           <PhotoGalleryStrip
@@ -343,6 +343,7 @@ function App() {
             items={sharedContent.kudos || []}
             sectionId="kudos"
             direction="right-to-left"
+            staticLayout={staticGallery}
           />
         )
       case 'sharecarefamilymoments':
@@ -353,6 +354,7 @@ function App() {
             items={sharedContent.familyMoments || []}
             sectionId="sharecare-family-moments"
             direction="left-to-right"
+            staticLayout={staticGallery}
           />
         )
       default:
@@ -411,7 +413,7 @@ function App() {
                 {renderSection('capturedconversation')}
               </details>
             </div>
-          ) : renderSection(requestedSection)}
+          ) : renderSection(requestedSection, { staticGallery: true })}
         </SectionPage>
 
         <AppFooter />

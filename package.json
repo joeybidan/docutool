@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm run test:news && npm run test:presence && npm run test:wrapup && npm run test:review && npm run test:favorites && npm run test:distance && vite build",
+    "build": "npm run test:news && npm run test:presence && npm run test:wrapup && npm run test:review && npm run test:favorites && npm run test:distance && npm run test:galleries && vite build",
     "preview": "vite preview",
     "test:carematch": "node --test tests/carematch.test.mjs",
     "test:time-tools": "node --test tests/time-tools.test.mjs",
@@ -17,7 +17,8 @@
     "test:wrapup": "node --test tests/call-wrapup.test.mjs",
     "test:review": "node --test tests/documentation-review.test.mjs",
     "test:favorites": "node --test tests/workspace-favorites.test.mjs",
-    "test:distance": "node --test tests/distance-check.test.mjs"
+    "test:distance": "node --test tests/distance-check.test.mjs",
+    "test:galleries": "node --test tests/photo-roulette.test.mjs"
   },
   "dependencies": {
     "@netlify/blobs": "11.1.0",

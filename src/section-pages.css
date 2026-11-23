@@ -289,7 +289,7 @@
 .section-page--teamrecognition .recognition-card[aria-hidden='true'],
 .section-page--kudos .recognition-card[aria-hidden='true'],
 .section-page--sharecarefamilymoments .recognition-card[aria-hidden='true'] {
-  display: none;
+  display: none !important; /* Defensive fallback if animated clones ever reach a focused page. */
 }
 
 .section-page--teamrecognition .photo-roulette-track .recognition-card,
